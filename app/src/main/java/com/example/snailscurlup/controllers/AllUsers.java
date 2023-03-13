@@ -51,6 +51,7 @@ public class AllUsers {
         User newUser = new User(username, email, phoneNumber, profilePhotoPath, device_id);
         SharedPreferencesUtils.addUser(context, newUser);
         users.add(newUser);
+
         //Firebase add user
         CollectionReference collectionReference = db.collection("Users");
         final String TAG = "Sample";
@@ -77,6 +78,26 @@ public class AllUsers {
                         }
                     });
         }
+
+        //instantiates a QR Wallet for the User
+        HashMap<String, String> empty = new HashMap<>();
+        CollectionReference QRRef= db.collection("Users").document(username).collection("QRList");
+        QRRef
+                .document("wallet ID")
+                .set(empty)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d(TAG, "Data has been added successfully!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Log.d(TAG, "Data not be added!" + e.toString());
+                    }
+                });
     }
 
     // Method to remove an existing user

@@ -53,7 +53,6 @@ public class AllUsers {
         users.add(newUser);
 
         //Firebase add user
-        CollectionReference collectionReference = db.collection("Users");
         final String TAG = "Sample";
         HashMap<String, String> data = new HashMap<>();
         if (username.length() > 0) {  //if (userName.length() > 0 && email.length() > 0 && phoneNumber.length() > 0)
@@ -61,7 +60,7 @@ public class AllUsers {
             data.put("PhoneNumber", phoneNumber);
             data.put("Total Score", "0");
             data.put("Codes Scanned","0");
-            collectionReference
+            db.collection("Users")
                     .document(username)
                     .set(data)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -81,8 +80,7 @@ public class AllUsers {
 
         //instantiates a QR Wallet for the User
         HashMap<String, String> empty = new HashMap<>();
-        CollectionReference QRRef= db.collection("Users").document(username).collection("QRList");
-        QRRef
+            db.collection("Users").document(username).collection("QRList")
                 .document("wallet ID")
                 .set(empty)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -104,6 +102,23 @@ public class AllUsers {
     public void removeUser(User user) {
         users.remove(user);
         SharedPreferencesUtils.deleteUser(context, user);
+
+        //remove user from firebase
+        final String TAG = "Sample";
+        db.collection("Users").document(user.getUsername())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d(TAG, "Deleted successfully!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document"+e.toString());
+                    }
+                });
     }
 
     //check if a username already exists

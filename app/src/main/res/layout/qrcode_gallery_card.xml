@@ -9,13 +9,14 @@
     app:cardCornerRadius="8dp"
     app:cardMaxElevation="10dp"
     app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="false">
+    app:cardUseCompatPadding="false" >
 
     <!--    https://www.geeksforgeeks.org/cardview-using-recyclerview-in-android-with-example/-->
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
         <!-- ImageVIew to display our Course Image -->
 
@@ -29,6 +30,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:contentDescription="@string/app_name"
+            android:background="@color/white"
             android:cropToPadding="true"
             android:padding="5dp"
             android:src="@drawable/app_logo" />
@@ -39,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+
             android:layout_toEndOf="@id/qrcode_visual"
             android:text="@string/qrcode_name"
             android:textColor="@color/white"

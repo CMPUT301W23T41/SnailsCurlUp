@@ -188,7 +188,6 @@ public class QRInfoDialogFragment extends DialogFragment {
 
                 // Clear the EditText and hide the keyboard
                 addCommentEditText.setText("");
-                addCommentEditText.setCursorVisible(false);
                 hideKeyboardFrom(getContext(), view);
 
 

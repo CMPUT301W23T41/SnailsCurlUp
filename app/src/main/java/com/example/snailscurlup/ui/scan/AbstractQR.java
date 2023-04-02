@@ -149,11 +149,14 @@ public class AbstractQR implements Serializable {
      */
     // setter for name uses names list to randomly assign a name to each Qr code
     public void setName() {
-        long seed2 = Long.parseLong(this.hash.substring(0, 15), 16);
-        Random rand = new Random(seed2);
+        long seed1 = Long.parseLong(this.hash.substring(0, 15), 16);
+        Random rand = new Random(seed1);
         int adjIndex = rand.nextInt(names.adjectives.length);
-        String newname = names.adjectives[adjIndex];
-        this.name = newname;
+        BigInteger seed2 = new BigInteger(hash, 16);
+        Random random = new Random(seed2.longValue());
+        int nounIndex = random.nextInt(names.nouns.length);
+        String name = names.adjectives[adjIndex] + " " + names.nouns[nounIndex];
+        this.name = name;
     }
 
     // Getter and Setter for pointsInt

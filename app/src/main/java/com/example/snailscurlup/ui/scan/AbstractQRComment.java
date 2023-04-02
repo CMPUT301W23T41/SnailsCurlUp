@@ -27,7 +27,7 @@ public class AbstractQRComment {
     public AbstractQRComment() {
     }
 
-    public AbstractQRComment(String content, String username,Timestamp commentTime) {
+    public AbstractQRComment(String username, String content,Timestamp commentTime) {
         this.message = content;
         this.username = username;
 

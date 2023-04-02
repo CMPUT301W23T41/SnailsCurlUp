@@ -7,7 +7,6 @@ import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 
 import static com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -15,7 +14,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -33,7 +31,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import com.example.snailscurlup.R;
-import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
@@ -47,7 +44,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class DecodeFragment extends Fragment {
 
@@ -56,9 +52,6 @@ public class DecodeFragment extends Fragment {
     TextView photoStatus, geolocationStatus;
     NamesOfQR names = new NamesOfQR();
     FusedLocationProviderClient fusedLocationProviderClient;
-
-//    private NavigationHeaderListener NavBarHeadListener; // get reference to main activity so that we can set  Haeder In bit
-    private UserListListener userListListener; // get reference to main activity so that we can set  Haeder In bit
 
     private String data;
 
@@ -79,29 +72,6 @@ public class DecodeFragment extends Fragment {
     private String QRData;
 
     String testaddress ;
-
-//    @Override
-//    public void onAttach(@NonNull Context context) {
-//        super.onAttach(context);
-//        if (context instanceof UserListListener) {
-//            userListListener = (UserListListener) context;
-//        } else {
-//            throw new RuntimeException(context + " must implement UserListListener");
-//        }
-//    }
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        activeUser = userListListener.getAllUsers().getActiveUser();
-//
-//
-//    }
-//    @Override
-//    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-//        super.onPause();
-//        activeUser = userListListener.getAllUsers().getActiveUser();
-//    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

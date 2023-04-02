@@ -78,14 +78,14 @@ public class QRInfoDialogFragment extends DialogFragment {
 
 
 
-    @Override
-    public void onResume() {
-
-        super.onResume();
-        /******** PLEASE FIX THIS -> coment wont show one adapter closed and open again ********/
-        clickedQRCodeComments = clickedQRCodeAbstract.getQRcomments();
-        setAdapter(clickedQRCodeComments);
-    }
+//    @Override
+//    public void onResume() {
+//
+//        super.onResume();
+//        /******** PLEASE FIX THIS -> coment wont show one adapter closed and open again ********/
+//        clickedQRCodeComments = clickedQRCodeAbstract.getQRcomments();
+//        setAdapter(clickedQRCodeComments);
+//    }
 
     @NonNull
     @Override

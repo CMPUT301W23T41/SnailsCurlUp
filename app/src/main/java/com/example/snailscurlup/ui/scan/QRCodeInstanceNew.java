@@ -102,8 +102,10 @@ public class QRCodeInstanceNew {
         } else {
             this.scanQRLogLocation = QRLoglocation;
         }
+    }
 
-
+    public String getScanQRLogLocation() {
+        return this.scanQRLogLocation;
     }
 
 

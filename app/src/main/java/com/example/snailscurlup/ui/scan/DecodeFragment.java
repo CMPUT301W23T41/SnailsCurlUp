@@ -35,6 +35,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.snailscurlup.R;
 import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -67,7 +68,7 @@ public class DecodeFragment extends Fragment {
     private AllUsersController allUsersController;
     private QRCode newQRCode;
 
-
+    private Database db;
 
 
     /******for new abstract Qr code *******/
@@ -149,6 +150,9 @@ public class DecodeFragment extends Fragment {
 
                 /***** For NEW abstract QR code *****/
                 newAbstractQR = new AbstractQR(data);
+
+                long currentTimestamp = System.currentTimeMillis();
+                testLogTimeStamp = new Timestamp(currentTimestamp);
                 /****** End of NEW abstract QR code *******/
 
 
@@ -268,6 +272,11 @@ public class DecodeFragment extends Fragment {
                 // TODO: INSERT FIREBASE CODE
 
                 // retrieve active user
+                db = Database.getInstance();
+                activeUser = allUsers.getActiveUser();
+                QRCodeInstanceNew code = new QRCodeInstanceNew(newAbstractQR, activeUser, testLogPhotoBitmap, testLogTimeStamp, testaddress);
+                db.addQRCodeToUser(activeUser, code, getContext());
+
                 // retrieve active user
                 //activeUser =  userListListener.getAllUsers().getActiveUser();
                 //userListListener.getAllUsers().getActiveUser().addScannedQrCodes(newQRCode);

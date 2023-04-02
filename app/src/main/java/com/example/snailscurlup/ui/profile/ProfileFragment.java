@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -21,13 +22,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.snailscurlup.R;
 import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.example.snailscurlup.ui.scan.QRGalleryAdapter;
 import com.example.snailscurlup.ui.scan.QRCodeInstanceNew;
 import com.example.snailscurlup.ui.startup.StartUpActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
@@ -54,7 +62,7 @@ public class ProfileFragment extends Fragment   {
     AllUsers allUsers;
     User activeUser;
 
-
+    FirebaseFirestore db;
 
 
     private FloatingActionButton profileFloaMenuicon;
@@ -65,7 +73,7 @@ public class ProfileFragment extends Fragment   {
 
     private  RecyclerView QRGallery;
 
-
+    // private Database db;
 
 
     public ProfileFragment() {
@@ -149,6 +157,14 @@ public class ProfileFragment extends Fragment   {
             activeUser = new User();
         }
 
+        // Update stuff from DB
+//        db = Database.getInstance();
+//        // activeUser.fetchQRInstancesFromDB();
+//        ArrayList<QRCodeInstanceNew> databaseCodes = db.getUserQRCodeInstances(activeUser, getContext());
+//        for (QRCodeInstanceNew code : databaseCodes) {
+//            activeUser.addScannedInstanceQrCodes(code);
+//        }
+
         /**** commented out try for new AbstractQr implementation
         QrGalleryAdapter qrGalleryAdapter = new QrGalleryAdapter(this.getContext(), activeUser.getScannedQrCodes());
         ******/
@@ -156,9 +172,46 @@ public class ProfileFragment extends Fragment   {
         /****** new AbstractQr implementation ****/
 
 
-            setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
 
-
+        // Set up database
+        // NOTE: This is separate from the "Database" class because async actions need to be done here.
+        // TODO: Move this somewhere so it only happens once (on boot)
+        // TODO: Also if you can't get this working later, just remove the DB call here. We can skip it if needed.
+        /**
+         * Current issue: QR codes are loaded correctly but can't update the RecyclerView
+         */
+        this.db = FirebaseFirestore.getInstance();
+        // Query the DB for all QR code documents
+        CollectionReference userReference = db.collection("Users");
+        String username = activeUser.getUsername();
+        userReference.document(username)
+                .collection("QRInstancesList")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // DEBUG - REMOVE LATER
+                            Toast.makeText(getContext(), "Found User QR Codes in DB!",Toast.LENGTH_SHORT).show();
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                // Iterate through each QR code, convert to instance
+                                String data = (String)doc.getData().get("data");
+                                Log.d("DATABASE HASH THING", data);  // DEBUG - REMOVE LATER
+                                // TODO: Maybe rework the way these are acquired?
+                                QRCodeInstanceNew newQR = new QRCodeInstanceNew(data, activeUser);
+                                // Add QR code to list
+                                // resultantList.add(newQR);
+                                activeUser.addScannedInstanceQrCodes(newQR);
+                                Log.d("DATABASE QR LENGTH", Integer.toString(activeUser.getScannedInstanceQrCodes().size()));
+                                // setAdapter(activeUser.getScannedInstanceQrCodes(), getParentFragmentManager());
+                            }
+                            // Toast.makeText(context, Integer.toString(resultantList.size()), Toast.LENGTH_SHORT);
+                            Toast.makeText(getContext(), "BING CHILLING!", Toast.LENGTH_SHORT);
+                        }
+                    }
+                });
+        Log.d("DATABASE QR COUNTER", Integer.toString(activeUser.getScannedInstanceQrCodes().size()));
 
 
         profileFloaMenuicon = view.findViewById(R.id.profile_floating_menuicon);
@@ -189,12 +242,6 @@ public class ProfileFragment extends Fragment   {
                 showBottomSheetQRGallerySortDialog();
             }
         });
-
-
-
-
-
-
 
         // Inflate the layo
 

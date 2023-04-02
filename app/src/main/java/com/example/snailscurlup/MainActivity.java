@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements UserListListener{
+public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     ActivityResultLauncher<String[]> PermissionResultLauncher;
@@ -77,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements UserListListener{
                 String email = sharedPreferences.getString("newEmail",null);
                 String phone = sharedPreferences.getString("newPhone",null);
                 String device_id = sharedPreferences.getString("newDeviceID",null);
-                userList.getUsers().addUser(username, email, phone,"", device_id);
+                userList.addUser(username, email, phone,"", device_id);
                 // Set new account status to false now
                 editor.putString("newAccount", "false");
                 editor.commit();
                 // Get active user
-                activeUser = userList.getUsers().getUserByUsername(username);
+                activeUser = userList.getUserByUsername(username);
             } else {
                 // Get active user info if old account
                 allUsers.userWanted(username);
@@ -93,9 +93,7 @@ public class MainActivity extends AppCompatActivity implements UserListListener{
             }
 
             // Set active user
-            userList.getUsers().setActiveUser(activeUser);
             allUsers.setActiveUser(activeUser);
-            activeUser = userList.getUsers().getActiveUser();
         }
 
         PermissionResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
@@ -183,16 +181,6 @@ public class MainActivity extends AppCompatActivity implements UserListListener{
 
         }
 
-    }
-
-    @Override
-    public User getActiveUser() {
-        return userList.getActiveUser();
-    }
-
-    @Override
-    public AllUsersController getAllUsers() {
-        return  userList.getUsers();
     }
 
 }

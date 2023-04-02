@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
-import com.example.snailscurlup.UserListListener;
-import com.example.snailscurlup.controllers.AllUsersController;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.example.snailscurlup.ui.scan.QRGalleryAdapter;
@@ -47,10 +45,6 @@ public class ProfileFragment extends Fragment   {
 
     // TODO: Rename and change types of parameters
 
-
-
-    private UserListListener userListListener;
-    private AllUsersController allUsersController;
     AllUsers allUsers;
     User activeUser;
 
@@ -71,22 +65,6 @@ public class ProfileFragment extends Fragment   {
     public ProfileFragment() {
         // Required empty public constructor
     }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-
-
-    }
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPause();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-    }
-
-
 
     /**
      * Use this factory method to create a new instance of
@@ -111,16 +89,6 @@ public class ProfileFragment extends Fragment   {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof UserListListener) {
-            userListListener = (UserListListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement UserListListener");
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -129,18 +97,6 @@ public class ProfileFragment extends Fragment   {
         QRGallery = view.findViewById(R.id.QRGalleryRecyclerView);
 
         allUsers = (AllUsers) getActivity().getApplicationContext();
-        allUsers.init();
-
-        // Only wait if active user is null at the moment
-        if (allUsers.getActiveUser() == null) {
-            // Wait for thread to finish
-            // allUsers list is initializing...
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
 
         // retrieve active user
         if (allUsers.getActiveUser() != null) {
@@ -156,7 +112,7 @@ public class ProfileFragment extends Fragment   {
         /****** new AbstractQr implementation ****/
 
 
-            setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
 
 
 

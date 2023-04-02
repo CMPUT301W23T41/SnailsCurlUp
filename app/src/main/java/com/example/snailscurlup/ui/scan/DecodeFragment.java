@@ -80,27 +80,27 @@ public class DecodeFragment extends Fragment {
 
     String testaddress ;
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof UserListListener) {
-            userListListener = (UserListListener) context;
-        } else {
-            throw new RuntimeException(context + " must implement UserListListener");
-        }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-
-
-    }
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPause();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-    }
+//    @Override
+//    public void onAttach(@NonNull Context context) {
+//        super.onAttach(context);
+//        if (context instanceof UserListListener) {
+//            userListListener = (UserListListener) context;
+//        } else {
+//            throw new RuntimeException(context + " must implement UserListListener");
+//        }
+//    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        activeUser = userListListener.getAllUsers().getActiveUser();
+//
+//
+//    }
+//    @Override
+//    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+//        super.onPause();
+//        activeUser = userListListener.getAllUsers().getActiveUser();
+//    }
 
 
     @Override
@@ -108,18 +108,6 @@ public class DecodeFragment extends Fragment {
                              Bundle savedInstanceState) {
         /********************* added to see if active user retieval wworks*/
         allUsers = (AllUsers) getActivity().getApplicationContext();
-        allUsers.init();
-
-        // Only wait if active user is null at the moment
-        if (allUsers.getActiveUser() == null) {
-            // Wait for thread to finish
-            // allUsers list is initializing...
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
 
         // retrieve active user
         if (allUsers.getActiveUser() != null) {

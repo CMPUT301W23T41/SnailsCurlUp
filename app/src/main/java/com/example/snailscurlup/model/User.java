@@ -1,6 +1,7 @@
 package com.example.snailscurlup.model;
 
 
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.ui.scan.QRCode;
 import com.example.snailscurlup.ui.scan.AbstractQR;
 import com.example.snailscurlup.ui.scan.QRCodeInstanceNew;
@@ -41,6 +42,8 @@ public class User implements Serializable {
         this.device_id = null;
         this.scannedQRCodes = new ArrayList<>();
         this.scannedInstanceQrCodes = new ArrayList<>();
+
+        // fetchQRInstancesFromDB();
     }
 
     public User(String username, String email, String phoneNumber, String totalScore) {
@@ -53,6 +56,7 @@ public class User implements Serializable {
         this.scannedQRCodes = new ArrayList<>();
         this.scannedInstanceQrCodes = new ArrayList<>();
 
+        // fetchQRInstancesFromDB();
     }
 
 
@@ -64,7 +68,20 @@ public class User implements Serializable {
         this.profilePhotoPath = profilePhotoPath;
         this.device_id = device_id;
         this.scannedQRCodes = new ArrayList<>();
+
+        // fetchQRInstancesFromDB();
     }
+
+    /**
+     * Checks the database and adds any QR code instances to the profile page.
+     */
+//    public void fetchQRInstancesFromDB() {
+//        Database db = Database.getInstance();
+//        ArrayList<QRCodeInstanceNew> codesToAdd = db.getUserQRCodeInstances(this);
+//        for (QRCodeInstanceNew code : codesToAdd) {
+//            this.scannedInstanceQrCodes.add(code);
+//        }
+//    }
 
     public String getTotalScore() {
         return totalScore;

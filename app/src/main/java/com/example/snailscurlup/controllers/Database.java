@@ -5,8 +5,10 @@ package com.example.snailscurlup.controllers;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.Toast;
+import com.google.firebase.database.ServerValue;
 
 import androidx.annotation.NonNull;
 
@@ -18,17 +20,22 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /* TOdO: implement listener so asynchonous operation  work */
 
@@ -41,7 +48,7 @@ import java.util.concurrent.ExecutionException;
  *
  * @author Ayan123
  */
-public class Database {
+public class Database{
 
     private static Database instance;
     private FirebaseFirestore db;
@@ -608,6 +615,67 @@ public class Database {
                 });
     }
 
+    /// add abstract qr
+    public void addAbstractQRToDb(AbstractQR code) {
+
+
+        checkAbstractQRExists(code.getHash()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                boolean exists = task.getResult();
+                if (!exists) {
+                    // Create a new document with the QR code's hash as the ID
+                    DocumentReference newAbstractQR = db.collection("AbstractQR").document(code.getHash());
+
+                    // Create a map of the data to add
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("name", code.getName());
+                    data.put("pointsInt", code.getPointsInt());
+                    data.put("URL", code.getURL());
+
+                    // Add the data to the document
+                    newAbstractQR.set(data)
+                            .addOnSuccessListener(unused -> Log.d("DATABASE-SUCCESS", "Successfully added new AbstractQR to database"))
+                            .addOnFailureListener(e -> Log.d("DATABASE-ERROR", "Failed to add new AbstractQR to database."));
+                } else {
+                    Log.d("ERROR", "Could not add duplicate AbstractQR to database!");
+                }
+            } else {
+                Log.e("ERROR", "Error checking if AbstractQR exists: ", task.getException());
+            }
+        });
+    }
+
+
+
+/***Reference: Using task<boolean> with qiery listener deal with main thread issues
+    Link: https://androidwave.com/firebase-remote-config/***/
+
+    public Task<Boolean> checkAbstractQRExists(String qrHash) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference abstractQR = db.collection("AbstractQR");
+        Query getHasQuery = abstractQR.whereEqualTo("hash", qrHash);
+
+        return getHasQuery.get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    Log.d("AbstractQR", "AbstractQR exists!");
+                    return true;
+                } else {
+                    Log.d("AbstractQR", "AbstractQR does not exist!");
+                    return false;
+                }
+            } else {
+                Log.e("AbstractQR", "Error checking if AbstractQR exists: ", task.getException());
+                throw task.getException();
+            }
+        });
+    }
+
+
+
+
+
 
     public ArrayList<QRCodeInstanceNew> getUserQRCodeInstancesNew(User user, Context context) {
         /**
@@ -645,5 +713,182 @@ public class Database {
 
 
     }
+
+
+    public void addQRCodeToUsernew(User user, QRCodeInstanceNew code, Context context) {
+        // First, check if user already owns this type of QR code
+        checkAbstractQRExists(code.AbstractQRHash()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                boolean exists = task.getResult();
+                if (!exists) {
+                    // Create a new document with the QR code's hash as the ID
+                    DocumentReference newAbstractQR = db.collection("AbstractQR").document(code.AbstractQRHash());
+
+                    // Create a map of the data to add
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("name", code.getName());
+                    data.put("pointsInt", code.getPointsInt());
+                    data.put("URL", code.getURL());
+
+                    // Add the data to the document
+                    newAbstractQR.set(data)
+                            .addOnSuccessListener(unused -> Log.d("DATABASE-SUCCESS", "Successfully added new AbstractQR to database"))
+                            .addOnFailureListener(e -> Log.d("DATABASE-ERROR", "Failed to add new AbstractQR to database."));
+
+                    /**** runnig out time implenet async so just wrote code here ****/
+                    /**** check user already own Qristance****/
+                    CollectionReference qrInstancesList = db.collection("Users").document(user.getUsername())
+                            .collection("QRInstancesList");
+
+                    Query query = qrInstancesList.whereEqualTo("data", code.AbstractQRHash());
+                    query.get().addOnCompleteListener(QRExisttask -> {
+                        if (QRExisttask.isSuccessful()) {
+                            QuerySnapshot querySnapshot = QRExisttask.getResult();
+                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                // If user already owns a QRCodeInstance with the same AbstractQRHash(), notify the user with a toast
+                                if (context != null) {
+                                    Toast.makeText(context, "You already have this QR code!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d("ERROR", "Could not add duplicate QR code to user in database!");
+                                }
+                            } else {
+                                // If not, add QR code
+                                HashMap<String, Object> dataQRInstance = new HashMap<>();
+                                dataQRInstance.put("data", code.AbstractQRHash());
+                                dataQRInstance.put("name", code.getName());
+                                dataQRInstance.put("points", code.getPointsInt());
+                                dataQRInstance.put("owner", user.getUsername());
+                                if (code.getScanQRLogTimeStamp() != null) {
+                                    java.sql.Timestamp sqlTimestamp = code.getScanQRLogTimeStamp();
+                                    // convert java.sql.Timestamp to com.google.firebase.Timestamp
+                                    Instant instant = null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                        instant = Instant.ofEpochMilli(sqlTimestamp.getTime());
+                                    }
+                                    dataQRInstance.put("timestamp", com.google.firebase.Timestamp.now());
+                                } else {
+                                    dataQRInstance.put("timestamp", null);
+                                }
+                                dataQRInstance.put("photo", null);  // TODO: Fix this later???
+                                dataQRInstance.put("location", code.getScanQRLogLocation());
+
+                                qrInstancesList.document(code.getName())
+                                        .set(dataQRInstance)
+                                        .addOnSuccessListener(unused -> {
+                                            if (context != null) {
+                                                Toast.makeText(context, "Added QR code to account!", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.d("DATABASE-SUCCESS", "Successfully added new QR to database");
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            if (context != null) {
+                                                Toast.makeText(context, "ERROR: Could not add QR code to account.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.d("DATABASE-ERROR", "Failed to add new QR to database.");
+                                            }
+                                        });
+                            }
+
+                        } else {
+                            Log.d("ERROR", "Could not add duplicate AbstractQR to database!");
+                        }
+
+
+                    });
+
+                }
+            }
+
+
+        });
+
+    }
+
+        // set a user QRInsrances list from database
+        public void setActiveUserQRInstancesList(User activeUser, Context context){
+
+
+            // Query the DB for all QR code documents
+            CollectionReference userReference = db.collection("Users");
+            String username = activeUser.getUsername();
+            userReference.document(username)
+                    .collection("QRInstancesList")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                // DEBUG - REMOVE LATER
+                                activeUser.clearScannedQRCodeInstance();
+
+                                for (QueryDocumentSnapshot doc : task.getResult()) {
+                                    // Get the data field from the document
+                                    String data = (String) doc.getData().get("data");
+
+
+                                    checkAbstractQRExists(data).addOnCompleteListener(newtask -> {
+                                        if (newtask.isSuccessful()) {
+                                            boolean exists = newtask.getResult();
+                                            if (exists) {
+
+
+                                                // Query the AbstractQR collection for the hash value
+                                                CollectionReference qrReference = db.collection("AbstractQR");
+                                                String hash = data;
+                                                qrReference.document(hash)
+                                                        .get()
+                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot qrDoc = task.getResult();
+                                                                    if (qrDoc.exists()) {
+
+                                                                        try {
+                                                                            String name = qrDoc.getString("name");
+                                                                            Long pointsLong = qrDoc.getLong("pointsInt");
+                                                                            Integer points = pointsLong != null ? Math.toIntExact(pointsLong) : null;
+                                                                            String url = qrDoc.getString("URL");
+
+                                                                            // Get other fields from the current doc
+                                                                            String location = doc.getString("location");
+                                                                            String owner = doc.getString("owner");
+                                                                            ;
+                                                                            // convert to java.sql.Timestamp
+                                                                            java.util.Date date = doc.getTimestamp("timestamp").toDate();
+                                                                            long timeInMillis = date.getTime();
+                                                                            java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(timeInMillis);
+
+                                                                            // Initialize a new QRCodeInstanceNew object
+                                                                            AbstractQR abstractQR = new AbstractQR(hash, name, points, url);
+                                                                            Bitmap scannedQRLogImage = null;  // TODO: get the image from somewhere
+                                                                            QRCodeInstanceNew newQR = new QRCodeInstanceNew(abstractQR, activeUser, null, sqlTimestamp, location);
+
+                                                                            // Add QR code to list
+                                                                            activeUser.addScannedQrCodes(newQR);
+
+                                                                        } catch (Exception e) {
+                                                                            Log.d("DATABASE-ERROR", "Failed to get QR to database.", e);
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+
+                                            }
+
+                                        }
+
+                                    });
+                                }
+                                //Toast.makeText(getContext(), "BING CHILLING!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+    }
+
+
 
 }

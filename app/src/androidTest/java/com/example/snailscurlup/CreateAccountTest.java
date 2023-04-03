@@ -71,7 +71,7 @@ public class CreateAccountTest {
         // Enter in fake information for account registration
         solo.enterText((EditText) solo.getView(R.id.username_field), dummyUsername);
         solo.enterText((EditText) solo.getView(R.id.Email_field), dummyEmail);
-        solo.enterText((EditText) solo.getView(R.id.phonenumber_field), dummyPhone);
+        //solo.enterText((EditText) solo.getView(R.id.phonenumber_field), dummyPhone);
 
         // Proceed with account creation
         solo.clickOnView(solo.getView(R.id.create_account_button));

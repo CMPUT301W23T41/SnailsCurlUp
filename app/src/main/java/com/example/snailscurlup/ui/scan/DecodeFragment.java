@@ -232,8 +232,13 @@ public class DecodeFragment extends Fragment {
                 // retrieve active user
                 db = Database.getInstance();
                 activeUser = allUsers.getActiveUser();
+
+                //db.addAbstractQRToDb(newAbstractQR);
+
                 QRCodeInstanceNew code = new QRCodeInstanceNew(newAbstractQR, activeUser, testLogPhotoBitmap, testLogTimeStamp, testaddress);
-                db.addQRCodeToUser(activeUser, code, getContext());
+                //db.addQRCodeToUser(activeUser, code, getContext());
+                db.addQRCodeToUsernew(activeUser, code, getContext());
+
                 try {
                     allUsers.addUserScanQRCodewithInstance(code, activeUser);
                 } catch (IOException e) {

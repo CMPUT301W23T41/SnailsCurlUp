@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 // This class just holds the users list and active user as a global variable so that
 // other activities can access it. Also, it is always up-to-date with firebase.
@@ -157,7 +158,9 @@ public class AllUsers extends Application {
     }
 
 
-        public boolean checkIfUserHasInstanceQrCode(String data,User activeUser){
+
+
+    public boolean checkIfUserHasInstanceQrCode(String data,User activeUser){
             return activeUser.checkIfInstanceQrCodeExists(getHash256Ins(data));
         }
 

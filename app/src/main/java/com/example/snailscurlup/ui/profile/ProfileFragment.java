@@ -32,6 +32,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -157,7 +158,7 @@ public class ProfileFragment extends Fragment   {
          * Current issue: QR codes are loaded correctly but can't update the RecyclerView
          */
 
-      this.db = FirebaseFirestore.getInstance();
+     /* this.db = FirebaseFirestore.getInstance();
 
         // Query the DB for all QR code documents
         CollectionReference userReference = db.collection("Users");
@@ -175,6 +176,30 @@ public class ProfileFragment extends Fragment   {
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 // Iterate through each QR code, convert to instance
                                 String data = (String)doc.getData().get("data");
+
+                                // Query the AbstractQR collection for the hash value
+                                CollectionReference qrReference = db.collection("AbstractQR");
+                                String hash = data;
+                                qrReference.document(hash)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot AbstractQR = task.getResult();
+                                                    if (AbstractQR.exists()) {
+
+                                                    }
+
+
+
+
+
+
+
+
+
+
                                 Log.d("DATABASE HASH THING", data);  // DEBUG - REMOVE LATER
                                 // TODO: Maybe rework the way these are acquired?
                                 QRCodeInstanceNew newQR = new QRCodeInstanceNew(data, activeUser);
@@ -189,10 +214,12 @@ public class ProfileFragment extends Fragment   {
                         }
                     }
                 });
-        Log.d("DATABASE QR COUNTER", Integer.toString(activeUser.getScannedInstanceQrCodes().size()));
+        Log.d("DATABASE QR COUNTER", Integer.toString(activeUser.getScannedInstanceQrCodes().size())); */
 
 
-
+        Database db = Database.getInstance();
+        activeUser = allUsers.getActiveUser();
+        db.setActiveUserQRInstancesList(activeUser, getContext());
         setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
         Toast.makeText(getContext(), "on create view setadapter", Toast.LENGTH_SHORT);
 

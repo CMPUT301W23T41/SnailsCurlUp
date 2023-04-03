@@ -22,6 +22,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.snailscurlup.R;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.squareup.picasso.Picasso;
@@ -160,6 +161,10 @@ public class QRInstanceLogDialogFragment extends DialogFragment {
             clickedQRCodeLocation = bundle.getString("clickedQRCodeLocation");
         }
 
+        Database db = Database.getInstance();
+
+       db.setActiveUserQRInstancesList(activeUser, getContext());
+
 
         //get AbstractQR object from hash:
          clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
@@ -168,7 +173,7 @@ public class QRInstanceLogDialogFragment extends DialogFragment {
         /**** setting Abstract qr info ****/
         //set QRCodeImage if Wifi access is available
         try {
-            Picasso.get().load(clickedQRCodeAbstract.getURL()).into(QRCodeImage);
+            Picasso.get().load(clickedQRCodeAbstract.getGenUrl()).into(QRCodeImage);
 
 
         } catch (Exception e) {

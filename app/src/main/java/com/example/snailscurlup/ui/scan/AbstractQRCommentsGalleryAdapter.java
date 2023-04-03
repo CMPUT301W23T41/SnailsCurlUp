@@ -52,7 +52,11 @@ public class AbstractQRCommentsGalleryAdapter extends RecyclerView.Adapter<Abstr
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+
         AbstractQRComment singleComment = QRComments.get(holder.getAdapterPosition());
+
+
 
 
         // Set username and message of comment

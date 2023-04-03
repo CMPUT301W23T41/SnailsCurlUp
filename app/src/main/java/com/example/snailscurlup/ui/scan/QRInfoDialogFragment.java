@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.squareup.picasso.Picasso;
@@ -140,6 +141,9 @@ public class QRInfoDialogFragment extends DialogFragment {
         Bundle args = getArguments();
         String clickedQRCodeHash = args.getString("clickedQRCodeHash");
 
+        Database db = Database.getInstance();
+        activeUser = allUsers.getActiveUser();
+
         //get AbstractQR object from hash:
         if(selectedUser != null){
             clickedQRCodeAbstract = selectedUser.getAbstractQrCode(clickedQRCodeHash);
@@ -147,9 +151,13 @@ public class QRInfoDialogFragment extends DialogFragment {
             clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
         }
 
+
+        ArrayList<QRCodeInstanceNew> UserDbQRList= db.setActiveUserQRInstancesList(activeUser, getContext());
+        activeUser.resetscanedQRCodeInstance(UserDbQRList);
+
         //set QRCodeImage if Wifi access is available
         try {
-            Picasso.get().load(clickedQRCodeAbstract.getURL()).into(QRCodeImage);
+            Picasso.get().load(clickedQRCodeAbstract.getGenUrl()).into(QRCodeImage);
 
         } catch (Exception e) {
             Toast.makeText(getContext(), "QR Image cant be shown, check WIFI", Toast.LENGTH_LONG).show();

@@ -20,7 +20,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.Timestamp;
+
+
+import java.sql.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,8 +31,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -629,7 +633,7 @@ public class Database{
                     // Create a map of the data to add
                     Map<String, Object> data = new HashMap<>();
                     data.put("name", code.getName());
-                    data.put("pointsInt", code.getPointsInt());
+                    data.put("pointsInt", code.getPointsInt().toString());
                     data.put("URL", code.getURL());
 
                     // Add the data to the document
@@ -671,6 +675,8 @@ public class Database{
             }
         });
     }
+
+
 
 
 
@@ -727,7 +733,7 @@ public class Database{
                     // Create a map of the data to add
                     Map<String, Object> data = new HashMap<>();
                     data.put("name", code.getName());
-                    data.put("pointsInt", code.getPointsInt());
+                    data.put("pointsInt", code.getPointsInt().toString());
                     data.put("URL", code.getURL());
 
                     // Add the data to the document
@@ -735,6 +741,7 @@ public class Database{
                             .addOnSuccessListener(unused -> Log.d("DATABASE-SUCCESS", "Successfully added new AbstractQR to database"))
                             .addOnFailureListener(e -> Log.d("DATABASE-ERROR", "Failed to add new AbstractQR to database."));
 
+                }
                     /**** runnig out time implenet async so just wrote code here ****/
                     /**** check user already own Qristance****/
                     CollectionReference qrInstancesList = db.collection("Users").document(user.getUsername())
@@ -756,7 +763,7 @@ public class Database{
                                 HashMap<String, Object> dataQRInstance = new HashMap<>();
                                 dataQRInstance.put("data", code.AbstractQRHash());
                                 dataQRInstance.put("name", code.getName());
-                                dataQRInstance.put("points", code.getPointsInt());
+                                dataQRInstance.put("points", code.getPointsInt().toString());
                                 dataQRInstance.put("owner", user.getUsername());
                                 if (code.getScanQRLogTimeStamp() != null) {
                                     java.sql.Timestamp sqlTimestamp = code.getScanQRLogTimeStamp();
@@ -765,7 +772,7 @@ public class Database{
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                                         instant = Instant.ofEpochMilli(sqlTimestamp.getTime());
                                     }
-                                    dataQRInstance.put("timestamp", com.google.firebase.Timestamp.now());
+                                    dataQRInstance.put("timestamp",  code.getScanQRLogTimeStamp().toString());
                                 } else {
                                     dataQRInstance.put("timestamp", null);
                                 }
@@ -798,7 +805,7 @@ public class Database{
                     });
 
                 }
-            }
+
 
 
         });
@@ -806,9 +813,10 @@ public class Database{
     }
 
         // set a user QRInsrances list from database
-        public void setActiveUserQRInstancesList(User activeUser, Context context){
+        public ArrayList<QRCodeInstanceNew> setActiveUserQRInstancesList(User activeUser, Context context) {
 
 
+            ArrayList<QRCodeInstanceNew> qrInstanceNewList = new ArrayList<>();
             // Query the DB for all QR code documents
             CollectionReference userReference = db.collection("Users");
             String username = activeUser.getUsername();
@@ -820,7 +828,7 @@ public class Database{
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
                                 // DEBUG - REMOVE LATER
-                                activeUser.clearScannedQRCodeInstance();
+                                //activeUser.clearScannedQRCodeInstance();
 
                                 for (QueryDocumentSnapshot doc : task.getResult()) {
                                     // Get the data field from the document
@@ -830,7 +838,26 @@ public class Database{
                                     checkAbstractQRExists(data).addOnCompleteListener(newtask -> {
                                         if (newtask.isSuccessful()) {
                                             boolean exists = newtask.getResult();
-                                            if (exists) {
+                                            if (!exists) {
+
+                                                AbstractQR newAbstractQRObj = new AbstractQR(data);
+
+                                                // Create a new document with the QR code's hash as the ID
+                                                DocumentReference newAbstractQR = db.collection("AbstractQR").document(newAbstractQRObj.getHash());
+
+                                                // Create a map of the data to add
+                                                Map<String, Object> data2 = new HashMap<>();
+                                                data2.put("name", newAbstractQRObj.getName());
+                                                data2.put("pointsInt", newAbstractQRObj.getPointsInt().toString());
+                                                data2.put("URL", newAbstractQRObj.getURL());
+
+                                                // Add the data to the document
+                                                newAbstractQR.set(data2)
+                                                        .addOnSuccessListener(unused -> Log.d("DATABASE-SUCCESS", "Successfully added new AbstractQR to database"))
+                                                        .addOnFailureListener(e -> Log.d("DATABASE-ERROR", "Failed to add new AbstractQR to database."));
+
+
+                                            }
 
 
                                                 // Query the AbstractQR collection for the hash value
@@ -847,26 +874,33 @@ public class Database{
 
                                                                         try {
                                                                             String name = qrDoc.getString("name");
-                                                                            Long pointsLong = qrDoc.getLong("pointsInt");
-                                                                            Integer points = pointsLong != null ? Math.toIntExact(pointsLong) : null;
+                                                                            Integer points= Integer.valueOf(qrDoc.getString("pointsInt"));
+
                                                                             String url = qrDoc.getString("URL");
 
                                                                             // Get other fields from the current doc
                                                                             String location = doc.getString("location");
                                                                             String owner = doc.getString("owner");
-                                                                            ;
+
+                                                                            Timestamp convtimestamp = null;
+                                                                            try {
+                                                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+                                                                                Date parsedDate = dateFormat.parse(doc.getString("timestamp"));
+                                                                                convtimestamp = new java.sql.Timestamp(parsedDate.getTime());
+                                                                            } catch(Exception e) { //this generic but you can control another types of exception
+                                                                                // look the origin of excption
+                                                                            }
                                                                             // convert to java.sql.Timestamp
-                                                                            java.util.Date date = doc.getTimestamp("timestamp").toDate();
-                                                                            long timeInMillis = date.getTime();
-                                                                            java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(timeInMillis);
+
 
                                                                             // Initialize a new QRCodeInstanceNew object
                                                                             AbstractQR abstractQR = new AbstractQR(hash, name, points, url);
                                                                             Bitmap scannedQRLogImage = null;  // TODO: get the image from somewhere
-                                                                            QRCodeInstanceNew newQR = new QRCodeInstanceNew(abstractQR, activeUser, null, sqlTimestamp, location);
+                                                                            QRCodeInstanceNew newQR = new QRCodeInstanceNew(abstractQR, activeUser, null, convtimestamp, location);
 
                                                                             // Add QR code to list
                                                                             activeUser.addScannedQrCodes(newQR);
+                                                                            qrInstanceNewList.add(newQR);
 
                                                                         } catch (Exception e) {
                                                                             Log.d("DATABASE-ERROR", "Failed to get QR to database.", e);
@@ -879,7 +913,7 @@ public class Database{
 
                                             }
 
-                                        }
+
 
                                     });
                                 }
@@ -887,6 +921,7 @@ public class Database{
                             }
                         }
                     });
+        return qrInstanceNewList;
     }
 
 

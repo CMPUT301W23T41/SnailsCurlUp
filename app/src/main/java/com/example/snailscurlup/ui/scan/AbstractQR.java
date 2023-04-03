@@ -273,6 +273,13 @@ public class AbstractQR implements Serializable {
         return QRcomments;
     }
 
+    public String getGenUrl(){
+        BigInteger seed = new BigInteger(this.hash, 16);
+        String NewURL = "https://picsum.photos/seed/" + seed + "/270";
+       return NewURL;
+
+
+    }
 
 }
 

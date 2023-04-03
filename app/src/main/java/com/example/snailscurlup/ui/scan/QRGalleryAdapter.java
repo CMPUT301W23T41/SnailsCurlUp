@@ -95,7 +95,7 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         //holder.QRCodeTimeStamp.setText(formattedTimestamp);
 
         // set the QR code image using Picasso
-        Picasso.get().load(singleqrcode.getURL()).into(holder.QrCodeVisual);
+        Picasso.get().load(singleqrcode.getAbstractQR().getGenUrl()).into(holder.QrCodeVisual);
 
 
         // set click listener on the item view

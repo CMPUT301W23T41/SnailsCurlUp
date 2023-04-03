@@ -124,6 +124,10 @@ public class AllUsers extends Application {
 
         }
 
+    public void deleteUserScanQRCode(User activeUser,QRCodeInstanceNew QRInstanceToDel){
+        activeUser.deletescannedQRCodeInstance(QRInstanceToDel);
+    }
+
 
         public boolean checkIfUserHasInstanceQrCode(String data,User activeUser){
             return activeUser.checkIfInstanceQrCodeExists(getHash256Ins(data));

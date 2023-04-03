@@ -41,7 +41,7 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
 
 
     /***** new QRCodeInstanceNew are using  *****/
-    private final ArrayList<QRCodeInstanceNew> QRCodeArrayList;
+    private  ArrayList<QRCodeInstanceNew> QRCodeArrayList;
 
     // add FragmentManager variable to pass to QRInfoDialogFragment
     private final FragmentManager fragmentManager;
@@ -127,6 +127,8 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
                     activeUser = new User();
                 }
 
+
+
                 // get the position of the clicked item
                 int position = holder.getAdapterPosition();
                 // get the QR code instance corresponding to the clicked item
@@ -136,6 +138,8 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
                 notifyDataSetChanged();
             }
         });
+
+
 
         holder.QRCodeViewLog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +181,12 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         } else {
             return QRCodeArrayList.size();
         }
+    }
+
+    public void setQrInstanceList(ArrayList<QRCodeInstanceNew> newList) {
+        QRCodeArrayList = new ArrayList<>();
+        QRCodeArrayList = newList;
+        notifyDataSetChanged();
     }
 
 

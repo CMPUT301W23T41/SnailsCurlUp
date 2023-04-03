@@ -206,6 +206,16 @@ public class User implements Serializable {
         }
     }
 
+    public void resetscanedQRCodeInstance(ArrayList<QRCodeInstanceNew> qrCodeInstanceresetList) {
+        scannedInstanceQrCodes.clear();
+        scannedInstanceQrCodes = qrCodeInstanceresetList;
+
+    }
+
+    public void clearScannedQRCodeInstance() {
+        scannedInstanceQrCodes.clear();
+    }
+
     /***************** End of NEW QR code Instance code *******************/
 
 }

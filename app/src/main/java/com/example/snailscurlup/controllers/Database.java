@@ -55,6 +55,7 @@ public class Database {
 
     /**
      * Returns the instance of the database (which is global).
+     *
      * @return An instance of the database.
      */
     public static Database getInstance() {
@@ -66,6 +67,7 @@ public class Database {
 
     /**
      * Uploads user info to the database. Stores user information in Firebase.
+     *
      * @param user - An object containing all of the user information.
      */
     public void addUser(User user) {
@@ -99,6 +101,7 @@ public class Database {
 
     /**
      * Deletes a user's data from the database.
+     *
      * @param user - Object referencing the user to be deleted
      */
     public void removeUser(User user) {
@@ -129,6 +132,7 @@ public class Database {
     /**
      * Used to check if an account with a certain username has already been registered.
      * Warns user if the username is already taken, and disallows account creation.
+     *
      * @param username - The username (String) to check if already registered.
      * @return Whether or not the username is available (False) or taken (True)
      */
@@ -150,6 +154,7 @@ public class Database {
 
     /**
      * Fetches the User object associated with a certain username from the database.
+     *
      * @param username - The username whose data is to be retrieved
      * @return - a User object containing all info tied to the username
      */
@@ -212,6 +217,7 @@ public class Database {
 
     /**
      * Updates a user's information in the database.
+     *
      * @param user - The User object containing the information that will
      *             overwrite the previous information.
      */
@@ -245,35 +251,34 @@ public class Database {
             addUser(user);
 
         } else if (user.getUsername() == oldUsername) { */
-            usersRef
-                    .document(user.getUsername())
-                    .update(data)
-                    .addOnSuccessListener(
-                            new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    Log.d(TAG, "User updated successfully");
+        usersRef
+                .document(user.getUsername())
+                .update(data)
+                .addOnSuccessListener(
+                        new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d(TAG, "User updated successfully");
 
 
-                                }
                             }
-                    )
-                    .addOnFailureListener(
-                            new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "User not updated: " + e);
-                                }
+                        }
+                )
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, "User not updated: " + e);
                             }
-                    );
-
-
+                        }
+                );
 
 
     }
 
     /**
      * Sets which user/account is currently active within the app.
+     *
      * @param user - The user who is supposed to be currently active
      */
     public void setActiveUser(User user) {
@@ -303,6 +308,7 @@ public class Database {
 
     /**
      * Fetches the currently active user within the instance of the app.
+     *
      * @return The User object for the active user
      */
     public User getActiveUser() {
@@ -334,11 +340,12 @@ public class Database {
                         });
 
         return activeUser[0];
-        }
+    }
 
     /**
      * Fetches a list of all users currently stored in the database.
-      * @return a List object containing all User objects in the DB.
+     *
+     * @return a List object containing all User objects in the DB.
      */
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>(); // create empty list to add users to
@@ -392,6 +399,7 @@ public class Database {
 
     /**
      * Checks if the user has a QR Instance of a particular type.
+     *
      * @param user - The user being checked in the database
      * @param code - The type of QR code to check for
      * @return True if user already owns QR, false if not
@@ -415,7 +423,7 @@ public class Database {
                 if (task.isSuccessful()) {
                     DocumentSnapshot doc = task.getResult();
 
-                    if(doc.exists()) {
+                    if (doc.exists()) {
                         foundMatch[0] = true;
                     }
                 }
@@ -523,10 +531,10 @@ public class Database {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             // DEBUG - REMOVE LATER
-                            Toast.makeText(context, "Found User QR Codes in DB!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Found User QR Codes in DB!", Toast.LENGTH_SHORT).show();
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 // Iterate through each QR code, convert to instance
-                                String data = (String)doc.getData().get("data");
+                                String data = (String) doc.getData().get("data");
                                 // Log.d("DATABASE HASH THING", data);  // DEBUG - REMOVE LATER
                                 // TODO: Maybe rework the way these are acquired?
                                 QRCodeInstanceNew newQR = new QRCodeInstanceNew(data, user);
@@ -563,6 +571,79 @@ public class Database {
 //                        }
 //                    }
 //                });
+    }
+
+
+    /****
+     * Delete A Qrisntance of user from the db
+     * Author: @AyanB123
+     */
+    public void deleteQRCodeFromUser(User user, QRCodeInstanceNew code, Context context) {
+
+        CollectionReference userReference = db.collection("Users");
+
+        userReference.document(user.getUsername())
+                .collection("QRInstancesList")
+                .document(code.getName())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        if (context != null) {
+                            Toast.makeText(context, "Deleted QR code from account!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("DATABASE-SUCCESS", "Successfully deleted QR from database");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (context != null) {
+                            Toast.makeText(context, "ERROR: Could not delete QR code from account.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("DATABASE-ERROR", "Failed to delete QR from database.");
+                        }
+                    }
+                });
+    }
+
+
+    public ArrayList<QRCodeInstanceNew> getUserQRCodeInstancesNew(User user, Context context) {
+        /**
+         * Issue: onCompleteListener operates asynchronously. Method is returning before list is created.
+         */
+        ArrayList<QRCodeInstanceNew> resultantList = new ArrayList<>();
+        // Query the DB for all QR code documents
+        CollectionReference userReference = db.collection("Users");
+        String username = user.getUsername();
+        userReference.document(username)
+                .collection("QRInstancesList")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // DEBUG - REMOVE LATER
+                            Toast.makeText(context, "Found User QR Codes in DB!", Toast.LENGTH_SHORT).show();
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                // Iterate through each QR code, convert to instance
+                                String data = (String) doc.getData().get("data");
+                                // Log.d("DATABASE HASH THING", data);  // DEBUG - REMOVE LATER
+                                // TODO: Maybe rework the way these are acquired?
+                                QRCodeInstanceNew newQR = new QRCodeInstanceNew(data, user);
+                                // Add QR code to list
+                                resultantList.add(newQR);
+                            }
+                            // Toast.makeText(context, Integer.toString(resultantList.size()), Toast.LENGTH_SHORT);
+                            Toast.makeText(context, "BING CHILLING!", Toast.LENGTH_SHORT);
+                        }
+                    }
+                });
+        // Log.d("DATABASE QR LIST THINGIE", Integer.toString(resultantList.size()));
+        return resultantList;
+
+
     }
 
 }

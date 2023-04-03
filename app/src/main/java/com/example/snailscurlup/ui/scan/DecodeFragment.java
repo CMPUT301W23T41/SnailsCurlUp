@@ -234,7 +234,11 @@ public class DecodeFragment extends Fragment {
                 activeUser = allUsers.getActiveUser();
                 QRCodeInstanceNew code = new QRCodeInstanceNew(newAbstractQR, activeUser, testLogPhotoBitmap, testLogTimeStamp, testaddress);
                 db.addQRCodeToUser(activeUser, code, getContext());
-
+                try {
+                    allUsers.addUserScanQRCodewithInstance(code, activeUser);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 // retrieve active user
                 //activeUser =  userListListener.getAllUsers().getActiveUser();
                 //userListListener.getAllUsers().getActiveUser().addScannedQrCodes(newQRCode);
@@ -297,7 +301,7 @@ public class DecodeFragment extends Fragment {
     }
 
     public void addUserQRCode(){
-        if(!allUsers.checkIfUserHasInstanceQrCode(QRData,activeUser)){
+       /* if(!allUsers.checkIfUserHasInstanceQrCode(QRData,activeUser)){
             long currentTimestamp = System.currentTimeMillis();
             testLogTimeStamp = new Timestamp(currentTimestamp);
             try {
@@ -309,7 +313,7 @@ public class DecodeFragment extends Fragment {
 
         }else{
             Toast.makeText(getActivity(), "Qr Code not added, already have scanned this Qr code", Toast.LENGTH_SHORT).show();
-        }
+        } */
     }
 
     public void setGeoLocation(Location currlocation){

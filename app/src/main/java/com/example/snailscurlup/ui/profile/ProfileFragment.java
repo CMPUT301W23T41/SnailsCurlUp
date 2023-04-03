@@ -101,6 +101,21 @@ public class ProfileFragment extends Fragment   {
 
     }
 
+   @Override
+   public void onStart() {
+         super.onStart();
+         // Set up database
+         // NOTE: This is separate from the "Database" class because async actions need to be done here.
+
+
+
+
+   }
+
+
+
+        // Set up database
+        // NOTE: This is separate from the "Database" class because async actions need to be done here.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -117,7 +132,7 @@ public class ProfileFragment extends Fragment   {
         } else {
             activeUser = new User();
         }
-
+        Toast.makeText(getContext(), "on create view", Toast.LENGTH_SHORT);
         // Update stuff from DB
 //        db = Database.getInstance();
 //        // activeUser.fetchQRInstancesFromDB();
@@ -133,7 +148,6 @@ public class ProfileFragment extends Fragment   {
         /****** new AbstractQr implementation ****/
 
 
-        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
 
         // Set up database
         // NOTE: This is separate from the "Database" class because async actions need to be done here.
@@ -142,7 +156,9 @@ public class ProfileFragment extends Fragment   {
         /**
          * Current issue: QR codes are loaded correctly but can't update the RecyclerView
          */
-        this.db = FirebaseFirestore.getInstance();
+
+      this.db = FirebaseFirestore.getInstance();
+
         // Query the DB for all QR code documents
         CollectionReference userReference = db.collection("Users");
         String username = activeUser.getUsername();
@@ -154,6 +170,7 @@ public class ProfileFragment extends Fragment   {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             // DEBUG - REMOVE LATER
+                            activeUser.clearScannedQRCodeInstance();
                             Toast.makeText(getContext(), "Found User QR Codes in DB!",Toast.LENGTH_SHORT).show();
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 // Iterate through each QR code, convert to instance
@@ -174,6 +191,10 @@ public class ProfileFragment extends Fragment   {
                 });
         Log.d("DATABASE QR COUNTER", Integer.toString(activeUser.getScannedInstanceQrCodes().size()));
 
+
+
+        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+        Toast.makeText(getContext(), "on create view setadapter", Toast.LENGTH_SHORT);
 
         profileFloaMenuicon = view.findViewById(R.id.profile_floating_menuicon);
         qrGallerIcon = view.findViewById(R.id.sortby_qrgallery_button);
@@ -326,8 +347,13 @@ public class ProfileFragment extends Fragment   {
         QRGalleryAdapter qrGalleryAdapter= new QRGalleryAdapter(this.getContext(), qrCodeInstanceNews, fragmentManager);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
 
+
         QRGallery.setLayoutManager(linearLayoutManager);
         QRGallery.setAdapter(qrGalleryAdapter);
+
+
+        Toast.makeText(getContext(), " setadpter method", Toast.LENGTH_SHORT);
+
     }
 
     // Sort User QR Instances based on sortType, 1 = Date New First, 2 = Date Old First, 3 = Points Ascending, 4 = Points Descending

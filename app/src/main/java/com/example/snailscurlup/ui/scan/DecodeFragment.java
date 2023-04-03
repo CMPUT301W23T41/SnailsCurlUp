@@ -7,7 +7,6 @@ import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 
 import static com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -15,7 +14,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -33,8 +31,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import com.example.snailscurlup.R;
-import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -47,7 +45,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class DecodeFragment extends Fragment {
 
@@ -57,9 +54,6 @@ public class DecodeFragment extends Fragment {
     NamesOfQR names = new NamesOfQR();
     FusedLocationProviderClient fusedLocationProviderClient;
 
-//    private NavigationHeaderListener NavBarHeadListener; // get reference to main activity so that we can set  Haeder In bit
-    private UserListListener userListListener; // get reference to main activity so that we can set  Haeder In bit
-
     private String data;
 
     private User activeUser;
@@ -67,7 +61,7 @@ public class DecodeFragment extends Fragment {
     private AllUsersController allUsersController;
     private QRCode newQRCode;
 
-
+    private Database db;
 
 
     /******for new abstract Qr code *******/
@@ -81,45 +75,10 @@ public class DecodeFragment extends Fragment {
     String testaddress ;
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof UserListListener) {
-            userListListener = (UserListListener) context;
-        } else {
-            throw new RuntimeException(context + " must implement UserListListener");
-        }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-
-
-    }
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPause();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-    }
-
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         /********************* added to see if active user retieval wworks*/
         allUsers = (AllUsers) getActivity().getApplicationContext();
-        allUsers.init();
-
-        // Only wait if active user is null at the moment
-        if (allUsers.getActiveUser() == null) {
-            // Wait for thread to finish
-            // allUsers list is initializing...
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
 
         // retrieve active user
         if (allUsers.getActiveUser() != null) {
@@ -149,6 +108,9 @@ public class DecodeFragment extends Fragment {
 
                 /***** For NEW abstract QR code *****/
                 newAbstractQR = new AbstractQR(data);
+
+                long currentTimestamp = System.currentTimeMillis();
+                testLogTimeStamp = new Timestamp(currentTimestamp);
                 /****** End of NEW abstract QR code *******/
 
 
@@ -268,6 +230,20 @@ public class DecodeFragment extends Fragment {
                 // TODO: INSERT FIREBASE CODE
 
                 // retrieve active user
+                db = Database.getInstance();
+                activeUser = allUsers.getActiveUser();
+
+                //db.addAbstractQRToDb(newAbstractQR);
+
+                QRCodeInstanceNew code = new QRCodeInstanceNew(newAbstractQR, activeUser, testLogPhotoBitmap, testLogTimeStamp, testaddress);
+                //db.addQRCodeToUser(activeUser, code, getContext());
+                db.addQRCodeToUsernew(activeUser, code, getContext());
+
+                try {
+                    allUsers.addUserScanQRCodewithInstance(code, activeUser);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 // retrieve active user
                 //activeUser =  userListListener.getAllUsers().getActiveUser();
                 //userListListener.getAllUsers().getActiveUser().addScannedQrCodes(newQRCode);
@@ -330,18 +306,19 @@ public class DecodeFragment extends Fragment {
     }
 
     public void addUserQRCode(){
-        if(!allUsers.checkIfUserHasInstanceQrCode(QRData,activeUser)){
+       /* if(!allUsers.checkIfUserHasInstanceQrCode(QRData,activeUser)){
             long currentTimestamp = System.currentTimeMillis();
             testLogTimeStamp = new Timestamp(currentTimestamp);
             try {
                 allUsers.addUserScanQRCode(QRData, activeUser,testLogPhotoBitmap, testLogTimeStamp,testaddress );
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
         }else{
             Toast.makeText(getActivity(), "Qr Code not added, already have scanned this Qr code", Toast.LENGTH_SHORT).show();
-        }
+        } */
     }
 
     public void setGeoLocation(Location currlocation){
@@ -370,4 +347,3 @@ public class DecodeFragment extends Fragment {
 
     /**temporary code locally saved and loaad scanned qr code*/
 }
-

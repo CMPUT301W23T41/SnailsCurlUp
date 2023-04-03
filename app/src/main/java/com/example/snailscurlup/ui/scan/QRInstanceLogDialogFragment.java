@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.format.DateUtils;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,45 +20,59 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 
 /**
- * QRInfoDialogFragment
+ * QRInstanceLogDialogFragment
  * <p>
- * This fragment displays the information about the QR code, when selected from Adapter
- * It also allows the user to add a comment to the QR code.
- * It also displays the comments that have been added to the QR code.
+ * This fragment displays the information about the QR code, and log detail of it of user
  *
  * @author AyanB123
  */
-public class QRInfoDialogFragment extends DialogFragment {
+public class QRInstanceLogDialogFragment extends DialogFragment {
 
 
     AllUsers allUsers;
     User activeUser;
-    User selectedUser;
     private Button dialogOkButton;
     private Button dialogAddCommentButton;
-    private EditText addCommentEditText;
-    private RecyclerView QRCommentGallery;
+
+    // all for Abstract Qr they scanned
     private ImageView QRCodeImage;
     private TextView QRCodeName;
     private TextView QRCodePoints;
     private AbstractQR clickedQRCodeAbstract;
 
-    private ArrayList<AbstractQRComment> clickedQRCodeComments;
+    // instance log detail of it
+    private ImageView QRCodeScanLogImage;
+    private TextView QRCodeScanLogUser;
+    private TextView QRCodeScanLogTime;
+    private TextView QRCodeScanLogLocation;
 
-    // This method sets the title and message for the dialog
+
+
+    /// datat to get data from passed form other gallery adapter
+    private String clickedQRCodeHash;
+    private Bitmap clickedQRCodeLogImage;
+    private String clickedQRCodeInstanceUserName;
+    private Timestamp clickedQRCodeTimeStamp;
+    private String clickedQRCodeLocation;
+
+
 
 
     /*** Reference for how hide keybaord:
@@ -70,8 +87,8 @@ public class QRInfoDialogFragment extends DialogFragment {
 
     }
 
-    public static QRInfoDialogFragment newInstance() {
-        QRInfoDialogFragment frag = new QRInfoDialogFragment();
+    public static QRInstanceLogDialogFragment newInstance() {
+        QRInstanceLogDialogFragment frag = new QRInstanceLogDialogFragment();
         Bundle args = new Bundle();
         frag.setArguments(args);
         return frag;
@@ -101,32 +118,28 @@ public class QRInfoDialogFragment extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.qrinfo_dialog_fragment, null);
+        View view = inflater.inflate(R.layout.qrviewlog_dialog_fragment, null);
 
 
         // Set the layout and buton and text  dialog
-        QRCommentGallery = view.findViewById(R.id.comment_recycler_view);
+      ;
         dialogOkButton = view.findViewById(R.id.dialog_ok_button);
-        dialogAddCommentButton = view.findViewById(R.id.add_comment_button);
-        addCommentEditText = view.findViewById(R.id.comment_box);
         QRCodeImage = view.findViewById(R.id.qrcode_image);
-        QRCodeName = view.findViewById(R.id.QR_name);
+        QRCodeName = view.findViewById(R.id.QR_name3);
         QRCodePoints = view.findViewById(R.id.QR_points);
+
+        // instance log detail of it
+        QRCodeScanLogImage = view.findViewById(R.id.qrcodelog_image);
+        QRCodeScanLogUser = view.findViewById(R.id.qr_scanuser);
+        QRCodeScanLogTime = view.findViewById(R.id.Qr_scantimestamp);
+        QRCodeScanLogLocation = view.findViewById(R.id.Qr_scanlocation);
+
+
 
 
         // get active user and userlist:
         allUsers = (AllUsers) getActivity().getApplicationContext();
-        allUsers.init();
-        // Only wait if active user is null at the moment
-        if (allUsers.getActiveUser() == null) {
-            // Wait for thread to finish
-            // allUsers list is initializing...
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+
         // retrieve active user
         if (allUsers.getActiveUser() != null) {
             activeUser = allUsers.getActiveUser();
@@ -137,71 +150,75 @@ public class QRInfoDialogFragment extends DialogFragment {
 
         //get hash of Qr code are wanting show:
         // Get the arguments passed to the fragment
-        Bundle args = getArguments();
-        String clickedQRCodeHash = args.getString("clickedQRCodeHash");
-
-        //get AbstractQR object from hash:
-        if(selectedUser != null){
-            clickedQRCodeAbstract = selectedUser.getAbstractQrCode(clickedQRCodeHash);
-        }else{
-            clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            clickedQRCodeHash = bundle.getString("clickedQRCodeHash");
+            clickedQRCodeLogImage = bundle.getParcelable("clickedQRCodeLogImage");
+            clickedQRCodeInstanceUserName = bundle.getString("clickedQRCodeInstanceUserName");
+            clickedQRCodeTimeStamp = new Timestamp(bundle.getLong("clickedQRCodeTimeStamp"));
+            clickedQRCodeInstanceUserName = bundle.getString("clickedQRCodeInstanceUserName");
+            clickedQRCodeLocation = bundle.getString("clickedQRCodeLocation");
         }
 
+
+        //get AbstractQR object from hash:
+         clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
+
+
+        /**** setting Abstract qr info ****/
         //set QRCodeImage if Wifi access is available
         try {
             Picasso.get().load(clickedQRCodeAbstract.getURL()).into(QRCodeImage);
+
 
         } catch (Exception e) {
             Toast.makeText(getContext(), "QR Image cant be shown, check WIFI", Toast.LENGTH_LONG).show();
         }
 
+
         //set QRCodeName
-        try {
-            QRCodeName.setText(clickedQRCodeAbstract.getName());
-        }catch (Exception e){
-            QRCodeName.setText(clickedQRCodeAbstract.getName());
-        }
+        QRCodeName.setText(clickedQRCodeAbstract.getName());
 
         //set QRCodePoints
         String points = clickedQRCodeAbstract.getPointsInt() + " points";
         QRCodePoints.setText(points);
 
-        //get QRCodeComments
-        clickedQRCodeComments = clickedQRCodeAbstract.getQRcomments();
+        /******************/
 
 
-        //set QRCodeComments adapter
-        setAdapter(clickedQRCodeComments);
+        /**** setting Instance qr scan info ****/
+
+        // set User Log intfo of QR code
+        String scanUser = "Scanned By: " + clickedQRCodeInstanceUserName;
+        QRCodeScanLogUser.setText(scanUser);
+
+        // set Time Log intfo of QR code
+        // format timestamp with simple Date format and set it to the textview
+        String pattern = " M/d/yy, h:mm a";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String formattedTimestamp = simpleDateFormat.format(clickedQRCodeTimeStamp);
+        String scanTimestamp = "Scanned Timestamp: " + formattedTimestamp ;
+        QRCodeScanLogTime.setText(scanTimestamp);
+
+        try {
+            QRCodeScanLogLocation.setText(clickedQRCodeLocation);
+            QRCodeScanLogImage.setImageBitmap(clickedQRCodeLogImage);
 
 
-        // Set the click listener for the add comment button
-        dialogAddCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the text from the EditText of comment
-                String Newcomment = addCommentEditText.getText().toString();
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "QR Log Image/ Location Not saved", Toast.LENGTH_LONG).show();
+            QRCodeScanLogLocation.setText("Location not recorded by User");
+
+        }
 
 
-                // Get the current timestamp of the comment
-                long currentTimestamp = System.currentTimeMillis();
-                Timestamp commentTimeStamp = new Timestamp(currentTimestamp);
-
-                // Add the comment to the AbstractQR code list
-                clickedQRCodeAbstract.addComment(activeUser.getUsername(), Newcomment, commentTimeStamp);
-
-                // Update the comment list
-                clickedQRCodeComments = clickedQRCodeAbstract.getQRcomments();
-
-                // Update the adapter
-                setAdapter(clickedQRCodeComments);
-
-                // Clear the EditText and hide the keyboard
-                addCommentEditText.setText("");
-                hideKeyboardFrom(getContext(), view);
 
 
-            }
-        });
+
+
+
+
+
 
         // Set the click listener for the OK button
         dialogOkButton.setOnClickListener(new View.OnClickListener() {
@@ -219,22 +236,5 @@ public class QRInfoDialogFragment extends DialogFragment {
 
     }
 
-    public void setSelectUser(User u){
-        this.selectedUser = u;
-    }
-
     // This method sets the adapter for the RecyclerView of COmments of AbstractQR
-    public void setAdapter(ArrayList<AbstractQRComment> qrCodeComments) {
-
-        // Set the adapter for the RecyclerView
-        AbstractQRCommentsGalleryAdapter commmentGalleryAdapter = new AbstractQRCommentsGalleryAdapter(this.getContext(), qrCodeComments);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
-
-        // Set the layout manager for the RecyclerView
-        QRCommentGallery.setLayoutManager(linearLayoutManager);
-
-        // Set the adapter for the RecyclerView
-        QRCommentGallery.setAdapter(commmentGalleryAdapter);
-    }
 }

@@ -2,6 +2,7 @@ package com.example.snailscurlup.ui.scan;
 
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,11 +60,12 @@ public class AbstractQRCommentsGalleryAdapter extends RecyclerView.Adapter<Abstr
         holder.commentMessage.setText(singleComment.getMessage());
 
 
-        // format timestamp with simple Date format
-        String pattern = "yyyy-MM-dd HH:mm:ssZ";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String formattedTimestamp = simpleDateFormat.format(singleComment.getTimestamp());
-        holder.commentTimestamp.setText(formattedTimestamp);
+        // generate relative time span
+        long commentTime = singleComment.getTimestamp().getTime();
+        long nowTime = System.currentTimeMillis();
+        CharSequence ago = DateUtils.getRelativeTimeSpanString(commentTime, nowTime, DateUtils.SECOND_IN_MILLIS);
+
+        holder.commentTimestamp.setText(ago.toString());
 
     }
 

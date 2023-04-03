@@ -10,8 +10,8 @@
     tools:context=".ui.search.SearchFragment" >
 
     <TextView
-        android:layout_width="160dp"
-        android:layout_height="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="20dp"
         android:text="@string/search_for_"

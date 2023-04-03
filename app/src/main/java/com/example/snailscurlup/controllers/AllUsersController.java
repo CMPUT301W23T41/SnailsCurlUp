@@ -121,60 +121,8 @@ public class AllUsersController {
                 });
     }
 
-    //check if a username already exists
-    public boolean isUsernameTaken(String username) {
-        return SharedPreferencesUtils.isUsernameTaken(context, username);
-    }
-
     // a user by their username
     public User getUserByUsername(String username) {
         return SharedPreferencesUtils.getUserByUsername(context, username);
-    }
-
-    //  check if a user is valid
-    public boolean isUserValid(String username) {
-        return SharedPreferencesUtils.getUserByUsername(context, username) != null;
-    }
-
-    // Getter for all users
-    public AllUsersController getUsers() {
-        return this;
-    }
-
-    // et the active user
-    public void setActiveUser(User user) {
-        activeUser = user;
-        SharedPreferencesUtils.setActiveUser(context, user);
-    }
-
-    //  get the active user
-    public User getActiveUser() {
-        return activeUser;
-    }
-
-    // Method to check if there is an active user
-    public boolean hasActiveUser() {
-        return activeUser != null;
-    }
-
-    // remove the active user
-    public void removeActiveUser() {
-        activeUser = null;
-        SharedPreferencesUtils.clearActiveUser(context);
-    }
-    public void addQRCode(QRCode qrCode) {
-        String userID = activeUser.getUsername(); // get user ID
-        SharedPreferencesUtils.addQRCode(context, userID, qrCode); // store QR code with user ID in shared preferences
-    }
-
-    //  update a user
-    public void updateUser(User editeduser) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getUsername().equals(editeduser.getUsername())) {
-                users.set(i, editeduser);
-                SharedPreferencesUtils.updateUser(context, editeduser);
-                break;
-            }
-        }
     }
 }

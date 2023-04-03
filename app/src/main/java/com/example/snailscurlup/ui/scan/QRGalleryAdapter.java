@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
+import com.example.snailscurlup.model.User;
+import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.squareup.picasso.Picasso;
 
@@ -44,6 +47,9 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
     // add FragmentManager variable to pass to QRInfoDialogFragment
     private final FragmentManager fragmentManager;
     private User selectedUser;
+
+    AllUsers allUsers;
+    User activeUser;
 
 
     // Constructor for initializing the values of context and data sent from Fragment works with Array Adapter
@@ -83,10 +89,10 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         holder.QRCodeScore.setText(String.valueOf(singleqrcode.getPointsInt()));
 
         // format timestamp with simple Date format and set it to the textview
-        String pattern = "E, dd MMM yyyy HH:mm:ss z";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String formattedTimestamp = simpleDateFormat.format(singleqrcode.getScanQRLogTimeStamp());
-        holder.QRCodeTimeStamp.setText(formattedTimestamp);
+        String pattern = " M/d/yy, h:mm a";
+      //  SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+       // String formattedTimestamp = simpleDateFormat.format(singleqrcode.getScanQRLogTimeStamp());
+        //holder.QRCodeTimeStamp.setText(formattedTimestamp);
 
         // set the QR code image using Picasso
         Picasso.get().load(singleqrcode.getURL()).into(holder.QrCodeVisual);
@@ -107,17 +113,75 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
                 Bundle bundle = new Bundle();
                 dialogFragment.setSelectUser(selectedUser);
                 bundle.putString("clickedQRCodeHash", clickedQRCode.AbstractQRHash());
+
                 // set the arguments of the QRInfoDialogFragment
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(fragmentManager, "QRInfoDialogFragment");
 
-
-
             }
         });
 
+
+
+        holder.DeleteQRCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AllUsers allUsers = (AllUsers) context.getApplicationContext();
+
+                // retrieve active user
+                if (allUsers.getActiveUser() != null) {
+                    activeUser = allUsers.getActiveUser();
+                } else {
+                    activeUser = new User();
+                }
+
+
+
+                // get the position of the clicked item
+                int position = holder.getAdapterPosition();
+                // get the QR code instance corresponding to the clicked item
+                QRCodeInstanceNew clickedQRCode = QRCodeArrayList.get(position);
+
+                allUsers.deleteUserScanQRCode(activeUser, clickedQRCode);
+                notifyDataSetChanged();
+            }
+        });
+
+
+
+        holder.QRCodeViewLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // get the position of the clicked item
+                int position = holder.getAdapterPosition();
+                // get the QR code instance corresponding to the clicked item
+                QRCodeInstanceNew clickedQRCode = QRCodeArrayList.get(position);
+
+                // create a new QRInstanceLogDialogFragment and pass the QR code details to it
+                QRInstanceLogDialogFragment dialogFragment = QRInstanceLogDialogFragment.newInstance();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("clickedQRCodeHash", clickedQRCode.AbstractQRHash());
+                bundle.putParcelable("clickedQRCodeLogImage", clickedQRCode.getScanQRLogImage());
+                bundle.putString("clickedQRCodeInstanceUserName", clickedQRCode.getScanQRInstanceUser().getUsername());
+                bundle.putLong("clickedQRCodeTimeStamp", clickedQRCode.getScanQRLogTimeStamp().getTime());
+                bundle.putString("clickedQRCodeLocation", clickedQRCode.getScanQRLogLocation());
+
+
+                // set the arguments of the QRInstanceLogDialogFragment
+                dialogFragment.setArguments(bundle);
+                dialogFragment.show(fragmentManager, "QRInstanceLogDialogFragment");
+            }
+        });
+
+
+
+
+
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -129,6 +193,15 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         }
     }
 
+    public void setQrInstanceList(ArrayList<QRCodeInstanceNew> newList) {
+        QRCodeArrayList = new ArrayList<>();
+        QRCodeArrayList = newList;
+        notifyDataSetChanged();
+    }
+
+
+
+
     // View holder class for initializing of your views such as TextView and Imageview
     public static class Viewholder extends RecyclerView.ViewHolder {
         private final ImageView QrCodeVisual;
@@ -137,12 +210,24 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
 
         private final TextView QRCodeTimeStamp;
 
+        private final Button QRCodeViewComment;
+
+        private final Button DeleteQRCode;
+
+        private final Button QRCodeViewLog;
+
+
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             QrCodeVisual = itemView.findViewById(R.id.qrcode_visual);
             QRCodeName = itemView.findViewById(R.id.qrcode_namefield);
             QRCodeScore = itemView.findViewById(R.id.qrcode_scorefield);
             QRCodeTimeStamp = itemView.findViewById(R.id.qrcode_timestampfield);
+            QRCodeViewComment = itemView.findViewById(R.id.view_comments);
+            DeleteQRCode = itemView.findViewById(R.id.delete_qrgallery_button);
+            QRCodeViewLog = itemView.findViewById(R.id.view_log);
+
+
         }
     }
 }

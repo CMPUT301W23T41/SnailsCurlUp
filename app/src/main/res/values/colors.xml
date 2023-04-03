@@ -7,9 +7,15 @@
     <color name="primary_color">#484A47</color>
     <color name="secondary_color">#747464</color>
     <color name="button_selected">#909083</color>
+    <color name="comments_background">#3B3D3B</color>
     <color name="blue_background">#86BBD8</color>
     <color name="bluefieldtext"> #86BBD8 </color>
 
 
     <color name="gray_400">#BDBDBD</color>
+
+
+    <color name="text_color">#212121</color>
+
+    <color name="light_blue">#CDF6FF</color>
 </resources>

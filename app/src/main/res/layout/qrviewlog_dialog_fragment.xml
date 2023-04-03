@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_color"
+    android:orientation="vertical"
+    android:pointerIcon="arrow"
+    app:layout_scrollEffect="none"
+    android:padding="15dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/scaninfolayout"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="15dp">
+
+        <TextView
+            android:id="@+id/QRFound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_info"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="QR Found"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/qrcode_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="116dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="115dp"
+            android:background="@color/white"
+
+            android:cropToPadding="true"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/QR_name3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/QRFound"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/QR_name3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="QR Name"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@+id/qrcode_image"
+            android:textColor="@color/white"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/QR_points"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:paddingStart="8dp"
+            android:paddingBottom="8dp"
+            android:text="QR Points"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@+id/QR_name3"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scaninfolayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/rounded_info"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        tools:layout_editor_absoluteX="15dp">
+
+        <TextView
+            android:id="@+id/Qr_scanimagetitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Scanned Log Image:"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+
+            android:textSize="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/qrscantitle" />
+
+        <TextView
+            android:id="@+id/Qr_scantimestamp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Scanned Timestamp:"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/qr_scanuser" />
+
+
+        <TextView
+            android:id="@+id/Qr_scanlocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Scanned Location:"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Qr_scantimestamp" />
+
+        <TextView
+            android:id="@+id/qr_scanuser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Scanned By:"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/qrcodelog_image" />
+
+        <ImageView
+            android:id="@+id/qrcodelog_image"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="0dp"
+            android:background="@color/white"
+            android:contentDescription="image log"
+            android:cropToPadding="true"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Qr_scanimagetitle"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/qrscantitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Log Of Scan:"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="40dp"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/dialog_ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/secondary_color"
+        android:fontFamily="casual"
+        android:text="OK"
+        android:textStyle="bold"
+        app:cornerRadius="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

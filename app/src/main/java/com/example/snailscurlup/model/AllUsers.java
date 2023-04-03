@@ -3,15 +3,22 @@ package com.example.snailscurlup.model;
 import static com.example.snailscurlup.ui.scan.AbstractQR.getHash256Ins;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Address;
+import android.util.Log;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.ui.scan.QRCode;
 //import com.example.snailscurlup.ui.scan.QrCode;
 import com.example.snailscurlup.ui.scan.AbstractQR;
 import com.example.snailscurlup.ui.scan.QRCodeInstanceNew;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,12 +31,15 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 // This class just holds the users list and active user as a global variable so that
 // other activities can access it. Also, it is always up-to-date with firebase.
 public class AllUsers extends Application {
     List<User> usersList = new ArrayList<User>();
     List<String> usernamesList = new ArrayList<String>();
+
+    private Database database;
     FirebaseFirestore db;
     Query allUsers;
     User activeUser;
@@ -119,18 +129,49 @@ public class AllUsers extends Application {
 
 
     /********** NEW Code for abstract QR **********/
-    public void addUserScanQRCode(String data, User activeUser, Bitmap scannedQRLogImage, Timestamp scanndQRLogTimeStamp, String adress) throws IOException {
+   /* public void addUserScanQRCode( AbstractQR newAbstractQR,  User activeUser,  Bitmap testLogPhotoBitmap, testLogTimeStamp, testaddress) throws IOException {
 
+        QRCodeInstanceNew code = new QRCodeInstanceNew(newAbstractQR, activeUser, testLogPhotoBitmap, testLogTimeStamp, testaddress);
         AbstractQR newabstractQRType = new AbstractQR(data);
         QRCodeInstanceNew newaQRInstance = new QRCodeInstanceNew(newabstractQRType,activeUser, scannedQRLogImage, scanndQRLogTimeStamp, adress);
         activeUser.addScannedInstanceQrCodes(newaQRInstance);
 
 
-        }
+        } */
 
 
-        public boolean checkIfUserHasInstanceQrCode(String data,User activeUser){
+    public void addUserScanQRCodewithInstance( QRCodeInstanceNew newQRInstance,  User activeUser) throws IOException {
+        activeUser.addScannedInstanceQrCodes(newQRInstance);
+
+    }
+
+    public void deleteUserScanQRCode(User activeUser,QRCodeInstanceNew QRInstanceToDel){
+        activeUser.deletescannedQRCodeInstance(QRInstanceToDel);
+        database = Database.getInstance();
+        database.deleteQRCodeFromUser(activeUser,QRInstanceToDel,getApplicationContext());
+
+    }
+
+    public ArrayList<QRCodeInstanceNew> loadUserScanQRCodefromDatabase(User activeUser){
+        database = Database.getInstance();
+        ArrayList<QRCodeInstanceNew> qrCodeInstancedbList = database.getUserQRCodeInstancesNew(activeUser,getApplicationContext());
+        activeUser.resetscanedQRCodeInstance(qrCodeInstancedbList);
+        return activeUser.getScannedInstanceQrCodes();
+
+
+    }
+
+
+
+
+    public boolean checkIfUserHasInstanceQrCode(String data,User activeUser){
             return activeUser.checkIfInstanceQrCodeExists(getHash256Ins(data));
         }
+
+
+
+
+
 }
+
 

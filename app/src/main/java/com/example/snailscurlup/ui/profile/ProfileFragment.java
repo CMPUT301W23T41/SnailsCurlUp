@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -19,15 +20,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
-import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
+import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
 import com.example.snailscurlup.ui.scan.QRGalleryAdapter;
 import com.example.snailscurlup.ui.scan.QRCodeInstanceNew;
 import com.example.snailscurlup.ui.startup.StartUpActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
@@ -47,14 +55,10 @@ public class ProfileFragment extends Fragment   {
 
     // TODO: Rename and change types of parameters
 
-
-
-    private UserListListener userListListener;
-    private AllUsersController allUsersController;
     AllUsers allUsers;
     User activeUser;
 
-
+    FirebaseFirestore db;
 
 
     private FloatingActionButton profileFloaMenuicon;
@@ -68,28 +72,16 @@ public class ProfileFragment extends Fragment   {
 
 
 
+
+    // private Database db;
+
+
     public ProfileFragment() {
         // Required empty public constructor
     }
     public ProfileFragment(User activeUser) {
         this.activeUser = activeUser;
     }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-
-
-    }
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPause();
-        activeUser = userListListener.getAllUsers().getActiveUser();
-    }
-
-
 
     /**
      * Use this factory method to create a new instance of
@@ -113,16 +105,21 @@ public class ProfileFragment extends Fragment   {
 
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof UserListListener) {
-            userListListener = (UserListListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement UserListListener");
-        }
-    }
+   @Override
+   public void onStart() {
+         super.onStart();
+         // Set up database
+         // NOTE: This is separate from the "Database" class because async actions need to be done here.
 
+
+
+
+   }
+
+
+
+        // Set up database
+        // NOTE: This is separate from the "Database" class because async actions need to be done here.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -132,18 +129,6 @@ public class ProfileFragment extends Fragment   {
         QRGallery = view.findViewById(R.id.QRGalleryRecyclerView);
 
         allUsers = (AllUsers) getActivity().getApplicationContext();
-        allUsers.init();
-
-        // Only wait if active user is null at the moment
-        if (allUsers.getActiveUser() == null) {
-            // Wait for thread to finish
-            // allUsers list is initializing...
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
 
         // retrieve active user
         if (allUsers.getActiveUser() != null) {
@@ -151,6 +136,14 @@ public class ProfileFragment extends Fragment   {
         } else {
             activeUser = new User();
         }
+        Toast.makeText(getContext(), "on create view", Toast.LENGTH_SHORT);
+        // Update stuff from DB
+//        db = Database.getInstance();
+//        // activeUser.fetchQRInstancesFromDB();
+//        ArrayList<QRCodeInstanceNew> databaseCodes = db.getUserQRCodeInstances(activeUser, getContext());
+//        for (QRCodeInstanceNew code : databaseCodes) {
+//            activeUser.addScannedInstanceQrCodes(code);
+//        }
 
         /**** commented out try for new AbstractQr implementation
         QrGalleryAdapter qrGalleryAdapter = new QrGalleryAdapter(this.getContext(), activeUser.getScannedQrCodes());
@@ -159,13 +152,83 @@ public class ProfileFragment extends Fragment   {
         /****** new AbstractQr implementation ****/
 
 
-            setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+
+        // Set up database
+        // NOTE: This is separate from the "Database" class because async actions need to be done here.
+        // TODO: Move this somewhere so it only happens once (on boot)
+        // TODO: Also if you can't get this working later, just remove the DB call here. We can skip it if needed.
+        /**
+         * Current issue: QR codes are loaded correctly but can't update the RecyclerView
+         */
+
+     /* this.db = FirebaseFirestore.getInstance();
+
+        // Query the DB for all QR code documents
+        CollectionReference userReference = db.collection("Users");
+        String username = activeUser.getUsername();
+        userReference.document(username)
+                .collection("QRInstancesList")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // DEBUG - REMOVE LATER
+                            activeUser.clearScannedQRCodeInstance();
+                            Toast.makeText(getContext(), "Found User QR Codes in DB!",Toast.LENGTH_SHORT).show();
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                // Iterate through each QR code, convert to instance
+                                String data = (String)doc.getData().get("data");
+
+                                // Query the AbstractQR collection for the hash value
+                                CollectionReference qrReference = db.collection("AbstractQR");
+                                String hash = data;
+                                qrReference.document(hash)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot AbstractQR = task.getResult();
+                                                    if (AbstractQR.exists()) {
+
+                                                    }
 
 
 
+
+
+
+
+
+
+
+                                Log.d("DATABASE HASH THING", data);  // DEBUG - REMOVE LATER
+                                // TODO: Maybe rework the way these are acquired?
+                                QRCodeInstanceNew newQR = new QRCodeInstanceNew(data, activeUser);
+                                // Add QR code to list
+                                // resultantList.add(newQR);
+                                activeUser.addScannedInstanceQrCodes(newQR);
+                                Log.d("DATABASE QR LENGTH", Integer.toString(activeUser.getScannedInstanceQrCodes().size()));
+                                // setAdapter(activeUser.getScannedInstanceQrCodes(), getParentFragmentManager());
+                            }
+                            // Toast.makeText(context, Integer.toString(resultantList.size()), Toast.LENGTH_SHORT);
+                            Toast.makeText(getContext(), "BING CHILLING!", Toast.LENGTH_SHORT);
+                        }
+                    }
+                });
+        Log.d("DATABASE QR COUNTER", Integer.toString(activeUser.getScannedInstanceQrCodes().size())); */
+
+
+        Database db = Database.getInstance();
+        activeUser = allUsers.getActiveUser();
+        db.setActiveUserQRInstancesList(activeUser, getContext());
+        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+        Toast.makeText(getContext(), "on create view setadapter", Toast.LENGTH_SHORT);
 
         profileFloaMenuicon = view.findViewById(R.id.profile_floating_menuicon);
         qrGallerIcon = view.findViewById(R.id.sortby_qrgallery_button);
+
 
 
 
@@ -192,11 +255,6 @@ public class ProfileFragment extends Fragment   {
                 showBottomSheetQRGallerySortDialog();
             }
         });
-
-
-
-
-
 
 
         // Inflate the layo
@@ -316,11 +374,16 @@ public class ProfileFragment extends Fragment   {
 
 
     public void setAdapter(ArrayList<QRCodeInstanceNew> qrCodeInstanceNews, FragmentManager fragmentManager) {
-        QRGalleryAdapter qrGalleryAdapter = new QRGalleryAdapter(this.getContext(), qrCodeInstanceNews, fragmentManager);
+        QRGalleryAdapter qrGalleryAdapter= new QRGalleryAdapter(this.getContext(), qrCodeInstanceNews, fragmentManager);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
+
 
         QRGallery.setLayoutManager(linearLayoutManager);
         QRGallery.setAdapter(qrGalleryAdapter);
+
+
+        Toast.makeText(getContext(), " setadpter method", Toast.LENGTH_SHORT);
+
     }
 
     // Sort User QR Instances based on sortType, 1 = Date New First, 2 = Date Old First, 3 = Points Ascending, 4 = Points Descending
@@ -405,8 +468,3 @@ public class ProfileFragment extends Fragment   {
 
 
     }
-
-
-
-
-

@@ -22,10 +22,18 @@
 
     <string name="qrcode_name">Name of QR:</string>
     <string name="qrcode_score">Score:</string>
-    <string name="qrcode_namefield">[name]</string>
-    <string name="qrcode_scorefield">[score]</string>
+    <string name="qrcode_namefield"> QR Code Name</string>
+    <string name="qrcode_scorefield">>QR Code Score</string>
     <string name="qrcode_timestamp">Time Stamp:</string>
-    <string name="qrcode_timestampfield">[timestamp]</string>
+    <string name="qrcode_timestampfield">12/11/21, 3:01 PM</string>
+
+
+    <string name="comment">Comment</string>
+    <string name="view_log_visual">View Log</string>
+    <string name="delete">Delete</string>
+
+
+
 
 
 </resources>

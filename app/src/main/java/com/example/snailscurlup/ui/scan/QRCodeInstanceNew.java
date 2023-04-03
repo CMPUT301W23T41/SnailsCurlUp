@@ -35,9 +35,9 @@ public class QRCodeInstanceNew implements Serializable {
 
     public QRCodeInstanceNew(AbstractQR scannedAbstractQRCodeType, User user, Bitmap scannedQRLogImage, Timestamp scanndQRLogTimeStamp, String ScanedQRLogLocation) {
         this.QRCodeAbstractType = scannedAbstractQRCodeType;
-        this.scanQRLogImage = scannedQRLogImage;
         this.scanQRInstanceUser = user;
         this.scanQRLogTimeStamp = scanndQRLogTimeStamp;
+
 
         // call extra method handle IOException e with try and catch block
         setScanQRComponent(ScanedQRLogLocation, scannedQRLogImage);
@@ -107,8 +107,10 @@ public class QRCodeInstanceNew implements Serializable {
         } else {
             this.scanQRLogLocation = QRLoglocation;
         }
+    }
 
-
+    public String getScanQRLogLocation() {
+        return this.scanQRLogLocation;
     }
 
 

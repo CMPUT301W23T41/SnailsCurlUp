@@ -193,11 +193,11 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         }
     }
 
-    public void setQrInstanceList(ArrayList<QRCodeInstanceNew> newList) {
-        QRCodeArrayList = new ArrayList<>();
-        QRCodeArrayList = newList;
-        notifyDataSetChanged();
-    }
+//    public void setQrInstanceList(ArrayList<QRCodeInstanceNew> newList) {
+//        QRCodeArrayList = new ArrayList<>();
+//        QRCodeArrayList = newList;
+//        notifyDataSetChanged();
+//    }
 
 
 

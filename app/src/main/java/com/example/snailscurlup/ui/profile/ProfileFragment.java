@@ -71,6 +71,7 @@ public class ProfileFragment extends Fragment   {
 
     private  RecyclerView QRGallery;
     private ConstraintLayout profileLayout;
+    private int sortType =1;
 
 
 
@@ -149,6 +150,15 @@ public class ProfileFragment extends Fragment   {
 
         QRGallery = view.findViewById(R.id.QRGalleryRecyclerView);
         profileLayout= view.findViewById(R.id.profileconstraintlayout);
+        profileLayout.setClickable(true);
+
+        profileLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SortedUserQRInstances(sortType);
+            }
+        });
+
 
         allUsers = (AllUsers) getActivity().getApplicationContext();
 
@@ -278,7 +288,7 @@ public class ProfileFragment extends Fragment   {
 
         userUsernameField.setText(activeUser.getUsername());
         userTotalScoreField.setText(String.valueOf(activeUser.totalPointsEarned()));
-        userCodeScannedField.setText(String.valueOf(activeUser.numberScannedQRCodeInstances()));
+        userCodeScannedField.setText(String.valueOf(activeUser.getScannedInstanceQrCodes().size()));
 
         profileFloaMenuicon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -369,7 +379,8 @@ public class ProfileFragment extends Fragment   {
         DateNewFirstButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SortedUserQRInstances(1);
+                sortType = 1;
+                SortedUserQRInstances(sortType);
                 Toast.makeText(getContext(), "Sorted By Newest Date First", Toast.LENGTH_LONG).show();
                 bottomSheetDialog.dismiss();
             }
@@ -378,7 +389,8 @@ public class ProfileFragment extends Fragment   {
         DateOldFirstButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SortedUserQRInstances(2);
+                sortType = 2;
+                SortedUserQRInstances(sortType);
                 Toast.makeText(getContext(), "Sorted By Oldest Date First", Toast.LENGTH_LONG).show();
                 bottomSheetDialog.dismiss();
 
@@ -388,7 +400,8 @@ public class ProfileFragment extends Fragment   {
        ScoreAscButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SortedUserQRInstances(3);
+                sortType = 3;
+                SortedUserQRInstances(sortType);
                 Toast.makeText(getContext(), "Sorted By Ascending Score", Toast.LENGTH_LONG).show();
                 bottomSheetDialog.dismiss();
             }
@@ -398,7 +411,8 @@ public class ProfileFragment extends Fragment   {
         ScoreDescButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SortedUserQRInstances(4);
+                sortType = 4;
+                SortedUserQRInstances(sortType);
                 Toast.makeText(getContext(), "Sorted By Descending Score", Toast.LENGTH_LONG).show();
                 bottomSheetDialog.dismiss();
             }

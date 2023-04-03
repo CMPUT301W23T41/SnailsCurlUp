@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.snailscurlup.R;
-import com.example.snailscurlup.UserListListener;
 import com.example.snailscurlup.controllers.AllUsersController;
 import com.example.snailscurlup.controllers.Database;
 import com.example.snailscurlup.model.AllUsers;
@@ -68,6 +67,10 @@ public class ProfileFragment extends Fragment   {
     private TextView userUsernameField, userTotalScoreField, userCodeScannedField;
 
     private  RecyclerView QRGallery;
+
+
+
+
 
     // private Database db;
 
@@ -178,6 +181,7 @@ public class ProfileFragment extends Fragment   {
 
 
 
+
         userUsernameField = view.findViewById(R.id.username_fieldprof);
         userTotalScoreField = view.findViewById(R.id.totalscore_fieldprof);
         userCodeScannedField = view.findViewById(R.id.codesscanned_fieldprof);
@@ -200,6 +204,7 @@ public class ProfileFragment extends Fragment   {
                 showBottomSheetQRGallerySortDialog();
             }
         });
+
 
         // Inflate the layo
 
@@ -318,7 +323,7 @@ public class ProfileFragment extends Fragment   {
 
 
     public void setAdapter(ArrayList<QRCodeInstanceNew> qrCodeInstanceNews, FragmentManager fragmentManager) {
-        QRGalleryAdapter qrGalleryAdapter = new QRGalleryAdapter(this.getContext(), qrCodeInstanceNews, fragmentManager);
+        QRGalleryAdapter qrGalleryAdapter= new QRGalleryAdapter(this.getContext(), qrCodeInstanceNews, fragmentManager);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
 
         QRGallery.setLayoutManager(linearLayoutManager);

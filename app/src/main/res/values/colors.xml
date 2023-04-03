@@ -13,4 +13,9 @@
 
 
     <color name="gray_400">#BDBDBD</color>
+
+
+    <color name="text_color">#212121</color>
+
+    <color name="light_blue">#CDF6FF</color>
 </resources>

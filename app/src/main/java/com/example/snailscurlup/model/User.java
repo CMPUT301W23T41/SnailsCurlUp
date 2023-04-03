@@ -197,6 +197,15 @@ public class User implements Serializable {
         return totalPoints;
     }
 
+    public void deletescannedQRCodeInstance(QRCodeInstanceNew qrCodeInstance) {
+        for (QRCodeInstanceNew qrCodeInstance1 : scannedInstanceQrCodes) {
+            if (qrCodeInstance1.getAbstractQR().getHash().equals(qrCodeInstance.getAbstractQR().getHash())) {
+                scannedInstanceQrCodes.remove(qrCodeInstance1);
+                break;
+            }
+        }
+    }
+
     /***************** End of NEW QR code Instance code *******************/
 
 }

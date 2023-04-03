@@ -51,6 +51,13 @@ public class QRCodeInstanceNew implements Serializable {
         this.scanQRInstanceUser = user;
         this.scanQRLogTimeStamp = timestamp;
     }
+    public QRCodeInstanceNew(String data, User user) {
+        // Alternate constructor that builds it with the data
+        this.QRCodeAbstractType = new AbstractQR(data);
+        this.scanQRLogImage = null;
+        this.scanQRInstanceUser = user;
+        this.scanQRLogTimeStamp = null;
+    }
     public void setScanQRLogTimeStamp(Timestamp timeStamp){
         this.scanQRLogTimeStamp = timeStamp;
     }

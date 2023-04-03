@@ -87,6 +87,10 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
         // set the Name and points  of the QR code
         holder.QRCodeName.setText(singleqrcode.getName());
         holder.QRCodeScore.setText(String.valueOf(singleqrcode.getPointsInt()));
+        if (selectedUser != null){
+            holder.DeleteQRCode.setVisibility(View.INVISIBLE);
+            holder.DeleteQRCode.setClickable(false);
+        }
 
         // format timestamp with simple Date format and set it to the textview
         String pattern = " M/d/yy, h:mm a";

@@ -219,8 +219,9 @@ public class ProfileFragment extends Fragment   {
 
         Database db = Database.getInstance();
         activeUser = allUsers.getActiveUser();
-        db.setActiveUserQRInstancesList(activeUser, getContext());
-        setAdapter(activeUser.getScannedInstanceQrCodes(),getParentFragmentManager());
+       ArrayList<QRCodeInstanceNew> UserDbQRList= db.setActiveUserQRInstancesList(activeUser, getContext());
+       activeUser.resetscanedQRCodeInstance(UserDbQRList);
+        setAdapter(UserDbQRList,getParentFragmentManager());
         Toast.makeText(getContext(), "on create view setadapter", Toast.LENGTH_SHORT);
 
         profileFloaMenuicon = view.findViewById(R.id.profile_floating_menuicon);

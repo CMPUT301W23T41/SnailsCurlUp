@@ -302,6 +302,7 @@ public class DecodeFragment extends Fragment {
             testLogTimeStamp = new Timestamp(currentTimestamp);
             try {
                 allUsers.addUserScanQRCode(QRData, activeUser,testLogPhotoBitmap, testLogTimeStamp,testaddress );
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

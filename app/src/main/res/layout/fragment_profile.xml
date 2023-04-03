@@ -10,6 +10,7 @@
 
 
     <FrameLayout
+        android:id="@+id/frameLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -77,7 +78,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
             android:fontFamily="casual"
             android:gravity="center"
             android:paddingLeft="10dp"
@@ -93,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:fontFamily="casual"
             android:gravity="center"
             android:text="@string/totalscore_fieldtext"
@@ -109,7 +109,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
             android:fontFamily="casual"
             android:gravity="center"
             android:paddingLeft="10dp"
@@ -126,7 +125,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:fontFamily="casual"
             android:gravity="center"
             android:text="@string/codesscanned_fieldtext"
@@ -142,7 +141,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
             android:fontFamily="casual"
             android:gravity="center"
             android:paddingLeft="10dp"
@@ -159,19 +157,19 @@
         android:id="@+id/sortby_qrgallery_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:fontFamily="casual"
+        android:backgroundTint="@color/secondary_color"
+        android:fontFamily="monospace"
         android:includeFontPadding="false"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Sort By"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:backgroundTint="@color/secondary_color"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:typeface="monospace"
-        app:cornerRadius="15sp"
+        app:cornerRadius="10sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/my_qr_codes"
@@ -187,40 +185,24 @@
         android:gravity="bottom|center_horizontal"
         android:text="My QR Codes"
         android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/QRGalleryRecyclerView"
         app:layout_constraintEnd_toEndOf="@+id/profile_image_circle"
-        app:layout_constraintStart_toStartOf="@+id/profile_image_circle"
-        app:layout_constraintTop_toBottomOf="@+id/profile_image_circle"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:fontFamily="casual"
-        android:gravity="bottom|center_horizontal"
-        android:text="My QR Codes"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/QRGalleryRecyclerView"
-        app:layout_constraintEnd_toEndOf="@+id/profile_image_circle"
-        app:layout_constraintStart_toStartOf="@+id/profile_image_circle"
-        app:layout_constraintTop_toBottomOf="@+id/profile_image_circle"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintHorizontal_bias="0.26"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/QRGalleryRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginVertical="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sortby_qrgallery_button"
-        tools:listitem="@layout/qrcode_gallery_card"
-        android:layout_marginVertical="10dp"/>
+        app:layout_constraintVertical_bias="0.0"
+        tools:listitem="@layout/qrcode_gallery_card" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

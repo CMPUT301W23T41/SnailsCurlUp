@@ -10,6 +10,7 @@ import com.example.snailscurlup.model.User;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 
@@ -17,15 +18,15 @@ import java.sql.Timestamp;
  * Represent lke Single Qrcode object type, has unique hasg,name picture, and number of points based on its data
  * A single Qr code can hav emany instance of it
  */
-public class QRCodeInstanceNew {
+public class QRCodeInstanceNew implements Serializable {
 
-    private final  AbstractQR QRCodeAbstractType;
+    private final AbstractQR QRCodeAbstractType;
 
-    private final Timestamp scanQRLogTimeStamp;
+    private transient Timestamp scanQRLogTimeStamp;
 
-    private Bitmap scanQRLogImage;
+    private transient Bitmap scanQRLogImage;
 
-    private Context context;
+    private transient Context context;
 
 
     private String scanQRLogLocation;
@@ -42,13 +43,16 @@ public class QRCodeInstanceNew {
         setScanQRComponent(ScanedQRLogLocation, scannedQRLogImage);
     }
 
-    public QRCodeInstanceNew(String data, User user) {
+
+    public QRCodeInstanceNew(AbstractQR type, User user, Timestamp timestamp) {
         // Alternate constructor that builds it with the data
-        AbstractQR QRType = new AbstractQR(data);
-        this.QRCodeAbstractType = QRType;
+        this.QRCodeAbstractType = type;
         this.scanQRLogImage = null;
         this.scanQRInstanceUser = user;
-        this.scanQRLogTimeStamp = null;
+        this.scanQRLogTimeStamp = timestamp;
+    }
+    public void setScanQRLogTimeStamp(Timestamp timeStamp){
+        this.scanQRLogTimeStamp = timeStamp;
     }
 
 
@@ -94,6 +98,7 @@ public class QRCodeInstanceNew {
             this.scanQRLogImage = QRLogImage;
         }
     }
+
 
 
     public void setScanQRLogLocation(String QRLoglocation) {

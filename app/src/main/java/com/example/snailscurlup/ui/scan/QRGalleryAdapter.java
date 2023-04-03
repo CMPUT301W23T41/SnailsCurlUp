@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.snailscurlup.R;
 import com.example.snailscurlup.model.AllUsers;
 import com.example.snailscurlup.model.User;
+import com.example.snailscurlup.model.User;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
 
     // add FragmentManager variable to pass to QRInfoDialogFragment
     private final FragmentManager fragmentManager;
+    private User selectedUser;
 
     AllUsers allUsers;
     User activeUser;
@@ -57,6 +59,14 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
 
         // set FragmentManager variable to pass to QRInfoDialogFragment
         this.fragmentManager = fragmentManager;
+    }
+    public QRGalleryAdapter(Context context, ArrayList<QRCodeInstanceNew> QRCodeArrayList, FragmentManager fragmentManager,User u) {
+        this.context = context;
+        this.QRCodeArrayList = QRCodeArrayList;
+
+        // set FragmentManager variable to pass to QRInfoDialogFragment
+        this.fragmentManager = fragmentManager;
+        this.selectedUser = u;
     }
 
     @NonNull
@@ -103,11 +113,11 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
                 // create a new QRInfoDialogFragment and pass the QR code hash to it
                 QRInfoDialogFragment dialogFragment = QRInfoDialogFragment.newInstance();
                 Bundle bundle = new Bundle();
-
+                dialogFragment.setSelectUser(selectedUser);
                 bundle.putString("clickedQRCodeHash", clickedQRCode.AbstractQRHash());
-
                 // set the arguments of the QRInfoDialogFragment
                 dialogFragment.setArguments(bundle);
+
                 dialogFragment.show(fragmentManager, "QRInfoDialogFragment");
 
             }
@@ -158,6 +168,7 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
                 bundle.putString("clickedQRCodeInstanceUserName", clickedQRCode.getScanQRInstanceUser().getUsername());
                 bundle.putLong("clickedQRCodeTimeStamp", clickedQRCode.getScanQRLogTimeStamp().getTime());
                 bundle.putString("clickedQRCodeLocation", clickedQRCode.getScanQRLogLocation());
+
 
                 // set the arguments of the QRInstanceLogDialogFragment
                 dialogFragment.setArguments(bundle);

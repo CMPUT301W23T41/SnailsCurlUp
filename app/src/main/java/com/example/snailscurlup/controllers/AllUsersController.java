@@ -80,8 +80,8 @@ public class AllUsersController {
 
         //instantiates a QR Wallet for the User
         HashMap<String, String> empty = new HashMap<>();
-        db.collection("Users").document(username).collection("QRList")
-                .document("wallet ID")
+        db.collection("Users").document(username).collection("QRInstancesList")
+                .document("dummy")
                 .set(empty)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

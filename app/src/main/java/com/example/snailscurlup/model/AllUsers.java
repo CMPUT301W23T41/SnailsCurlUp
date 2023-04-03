@@ -65,23 +65,27 @@ public class AllUsers extends Application {
                     String email = (String) doc.getData().get("Email");
                     String phone = (String)doc.getData().get("PhoneNumber");
                     String totalScore = doc.getData().get("Total Score").toString();
-                    CollectionReference collection = db.collection("Users").document(doc.getId()).collection("QRList");
+                    CollectionReference collection = db.collection("Users").document(doc.getId()).collection("QRInstancesList");
                     User user = new User(name,email,phone,totalScore);
                     collection.addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                             for (QueryDocumentSnapshot dc: value){
-                                // String qr = dc.getId();
-                                // QRCode code = new QRCode(qr);
-                                // user.addScannedQrCodes(code);
-                                String QR = dc.getId();
-                                String QRHash = (String) dc.get("data");
+                                String name = dc.getId();
+                                String QRHash = (String) dc.getData().get("data");
                                 if (QRHash != null) {
                                     AbstractQR type = new AbstractQR(QRHash);
-                                    // QRCode code = new QRCode(QR);
-                                    // QRCodeInstanceNew code = new QRCodeInstanceNew(type, user, null, null, null);
-                                    QRCodeInstanceNew code = new QRCodeInstanceNew(QRHash, user);
-                                    user.addScannedQrCodes(code);
+//                                    String location = (String) dc.getData().get("location");
+//                                    String owner = (String) dc.getData().get("owner");
+//                                    String points = (String) dc.getData().get("points");
+                                    String timeStamp = (String) dc.getData().get("timestamp");
+                                    try {
+                                        QRCodeInstanceNew code = new QRCodeInstanceNew(type, user, Timestamp.valueOf(timeStamp));
+                                        user.addScannedInstanceQrCodes(code);
+                                    }catch (Exception e){
+                                        QRCodeInstanceNew code = new QRCodeInstanceNew(type,user,null);
+                                        user.addScannedInstanceQrCodes(code);
+                                    }
                                 }
                             }
                         }

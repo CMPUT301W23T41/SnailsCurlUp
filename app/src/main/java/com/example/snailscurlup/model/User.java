@@ -123,6 +123,7 @@ public class User implements Serializable {
     public String getDevice_id() {
         return device_id;
     }
+    public void setTotalScore(String totalScore){this.totalScore = totalScore;}
 
     public void setDevice_id(String device_id) {
         this.device_id = device_id;
@@ -154,6 +155,8 @@ public class User implements Serializable {
 
     public void addScannedInstanceQrCodes(QRCodeInstanceNew scannedInstanceQrCodes) {
         this.scannedInstanceQrCodes.add(scannedInstanceQrCodes);
+        int score = scannedInstanceQrCodes.getPointsInt();
+        this.totalScore = Integer.toString(Integer.parseInt(this.totalScore) + score);
     }
 
     public ArrayList<QRCodeInstanceNew> getScannedInstanceQrCodes() {

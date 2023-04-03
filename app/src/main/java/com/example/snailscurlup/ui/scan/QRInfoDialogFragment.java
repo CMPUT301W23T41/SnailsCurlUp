@@ -44,6 +44,7 @@ public class QRInfoDialogFragment extends DialogFragment {
 
     AllUsers allUsers;
     User activeUser;
+    User selectedUser;
     private Button dialogOkButton;
     private Button dialogAddCommentButton;
     private EditText addCommentEditText;
@@ -144,7 +145,11 @@ public class QRInfoDialogFragment extends DialogFragment {
         activeUser = allUsers.getActiveUser();
 
         //get AbstractQR object from hash:
-        clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
+        if(selectedUser != null){
+            clickedQRCodeAbstract = selectedUser.getAbstractQrCode(clickedQRCodeHash);
+        }else{
+            clickedQRCodeAbstract = activeUser.getAbstractQrCode(clickedQRCodeHash);
+        }
 
 
         ArrayList<QRCodeInstanceNew> UserDbQRList= db.setActiveUserQRInstancesList(activeUser, getContext());
@@ -159,7 +164,11 @@ public class QRInfoDialogFragment extends DialogFragment {
         }
 
         //set QRCodeName
-        QRCodeName.setText(clickedQRCodeAbstract.getName());
+        try {
+            QRCodeName.setText(clickedQRCodeAbstract.getName());
+        }catch (Exception e){
+            QRCodeName.setText(clickedQRCodeAbstract.getName());
+        }
 
         //set QRCodePoints
         String points = clickedQRCodeAbstract.getPointsInt() + " points";
@@ -216,6 +225,10 @@ public class QRInfoDialogFragment extends DialogFragment {
         return builder.create();
 
 
+    }
+
+    public void setSelectUser(User u){
+        this.selectedUser = u;
     }
 
     // This method sets the adapter for the RecyclerView of COmments of AbstractQR

@@ -1,6 +1,8 @@
 package com.example.snailscurlup.ui.scan;
 
-public class NamesOfQR {
+import java.io.Serializable;
+
+public class NamesOfQR implements Serializable {
     String[] adjectives = new String[] {
             "Ablaze",
             "Abundant",

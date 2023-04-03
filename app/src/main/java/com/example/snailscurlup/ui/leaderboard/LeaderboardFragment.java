@@ -25,18 +25,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link LeaderboardFragment#newInstance} factory method to
+ * A Fragment subclass for displaying the leaderboard.
+ * The leaderboard can be displayed based on user scores or top scores from QR codes.
+ * The data is fetched from the Firebase Firestore.
+ * Use the LeaderboardFragment newInstance factory method to
  * create an instance of this fragment.
  */
 public class LeaderboardFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -48,18 +46,15 @@ public class LeaderboardFragment extends Fragment {
     FirebaseFirestore db;
 
     public LeaderboardFragment() {
-        // Required empty public constructor
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment LeaderboardFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LeaderboardFragment newInstance(String param1, String param2) {
         LeaderboardFragment fragment = new LeaderboardFragment();
         Bundle args = new Bundle();
@@ -69,6 +64,12 @@ public class LeaderboardFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Called to do initial creation of the fragment.
+     * This is called after onAttach and before onCreateView.
+     * @param savedInstanceState If the fragment is being re-created from a previous saved state,
+     * this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,25 +80,31 @@ public class LeaderboardFragment extends Fragment {
 
     }
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * The fragment should not add the view itself, but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_leaderboard,container, false);
-        cumulativeButton = view.findViewById(R.id.buttonUserList);   //button
+        cumulativeButton = view.findViewById(R.id.buttonUserList);   //views
         TopQrButton = view.findViewById(R.id.buttonQRList);
-
         leaderboardList = view.findViewById(R.id.leader_list);
-        leaderDataList = new ArrayList<>();
+
+        leaderDataList = new ArrayList<>();                     //list and adapter
         leaderAdapter = new com.example.snailscurlup.ui.leaderboard.LeaderList(getActivity(), leaderDataList);
         leaderboardList.setAdapter(leaderAdapter);
-
         db = FirebaseFirestore.getInstance();
 
         cumulativeButton.setBackgroundColor(getContext().getColor(R.color.button_selected));
         TopQrButton.setBackgroundColor(getContext().getColor(R.color.secondary_color));
 
-
-        Query User_leaderboard = db.collection("Users").orderBy("Total Score", Query.Direction.DESCENDING);
+        Query User_leaderboard = db.collection("Users").orderBy("Total Score", Query.Direction.DESCENDING);   //query
         Query QR_leaderboard = db.collection("QR").orderBy("score", Query.Direction.DESCENDING);
 
         User_leaderboard.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -105,10 +112,9 @@ public class LeaderboardFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 leaderDataList.clear();
                 for (QueryDocumentSnapshot doc : value) {
-                    String userName = doc.getId();
+                    String UserName = doc.getId();
                     String Score = (String) doc.getData().get("Total Score");
-                    String phone = (String) doc.getData().get("PhoneNumber");
-                    leaderDataList.add(new Leader(userName, Score, phone));
+                    leaderDataList.add(new Leader(UserName, Score));
                 }
                 leaderAdapter.notifyDataSetChanged();
             }
@@ -124,17 +130,15 @@ public class LeaderboardFragment extends Fragment {
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                         leaderDataList.clear();
                         for (QueryDocumentSnapshot doc : value) {
-                            String userName = doc.getId();
+                            String UserName = doc.getId();
                             String Score = (String) doc.getData().get("Total Score");
-                            String phone = (String) doc.getData().get("PhoneNumber");
-                            leaderDataList.add(new Leader(userName, Score, phone));
+                            leaderDataList.add(new Leader(UserName, Score));
                         }
                         leaderAdapter.notifyDataSetChanged();
                     }
                 });
             }
         });
-
 
         TopQrButton.setOnClickListener(new View.OnClickListener() {
            @Override
@@ -146,10 +150,9 @@ public class LeaderboardFragment extends Fragment {
                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                        leaderDataList.clear();
                        for (QueryDocumentSnapshot doc : value) {
-                           String city = doc.getId();
-                           String province = (String) doc.getData().get("score");
-                           String phone = (String) doc.getData().get("PhoneNumber");
-                           leaderDataList.add(new Leader(city, province, phone));
+                           String UserName = (String) doc.getData().get("name");
+                           String Score = (String) doc.getData().get("score");
+                           leaderDataList.add(new Leader(UserName, Score));
                        }
                        leaderAdapter.notifyDataSetChanged();
                    }
@@ -158,7 +161,6 @@ public class LeaderboardFragment extends Fragment {
        }
         );
 
-        // Inflate the layout for this fragment
         return view;
     }
 }

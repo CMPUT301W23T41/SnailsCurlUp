@@ -28,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.example.snailscurlup.model.User;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class SearchFragment extends Fragment {
@@ -36,6 +37,7 @@ public class SearchFragment extends Fragment {
     private ArrayAdapter<User> userAdapter;
 
     private ListView listView;
+    private User activeUser;
 
     private ImageButton searchButton;
 
@@ -44,12 +46,16 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public SearchFragment(User u) {
+        this.activeUser = u;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         userList = new ArrayList<User>();
-        userAdapter = new UserAdapter(getActivity(),userList);
+        userAdapter = new UserAdapter(getActivity(),userList, activeUser);
 
         // load the User file and put it in UserList here
     }
@@ -82,25 +88,28 @@ public class SearchFragment extends Fragment {
                         String email = (String) doc.getData().get("Email");
                         String phone = (String)doc.getData().get("PhoneNumber");
                         String totalScore = doc.getData().get("Total Score").toString();
-                        CollectionReference collection = db.collection("Users").document(doc.getId()).collection("QRList");
+                        CollectionReference collection = db.collection("Users").document(doc.getId()).collection("QRInstancesList");
                         User user1 = new User(name,email,phone,totalScore);
                         collection.addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                                 for (QueryDocumentSnapshot dc: value){
-                                    String QR = dc.getId();
-                                    String QRHash = (String) dc.get("data");
+                                    String name = dc.getId();
+                                    String QRHash = (String) dc.getData().get("data");
                                     if (QRHash != null) {
                                         AbstractQR type = new AbstractQR(QRHash);
-                                        // QRCode code = new QRCode(QR);
-                                        // QRCodeInstanceNew code = new QRCodeInstanceNew(type, user, null, null, null);
-                                        QRCodeInstanceNew code = new QRCodeInstanceNew(QRHash, user1);
-                                        user1.addScannedQrCodes(code);
+                                        String location = (String) dc.getData().get("location");
+                                        String owner = (String) dc.getData().get("owner");
+                                        String points = (String) dc.getData().get("points");
+                                        String timeStamp = (String) dc.getData().get("timestamp");
+
+                                        QRCodeInstanceNew code = new QRCodeInstanceNew(type, user1, Timestamp.valueOf(timeStamp));
+                                        user1.addScannedInstanceQrCodes(code);
                                     }
                                 }
+                                userList.add(user1);
                             }
                         });
-                        userList.add(user1);
 
                     }
                     userAdapter.notifyDataSetChanged();

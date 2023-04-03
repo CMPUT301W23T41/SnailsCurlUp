@@ -1,26 +1,25 @@
 package com.example.snailscurlup;
 
 import android.app.Activity;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import androidx.exifinterface.media.ExifInterface;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import android.widget.EditText;
-import android.widget.ListView;
 
-import com.example.snailscurlup.ui.startup.StartUpActivity;
 import com.robotium.solo.Solo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Random;
 
-public class CreateAccountTest {
+public class SearchingTest {
     private Solo solo;
 
     @Rule
@@ -44,45 +43,41 @@ public class CreateAccountTest {
         Activity activity = rule.getActivity();
     }
 
+
     /**
-     * Checks if the application can create an account from the initial screen.
-     * Synthesizes random user credentials for testing purposes.
+     * Using existing testing account: testusert41 and testuser
+     * Checking the search-by-username function from search page
      * @throws AssertionError - For when test fails
      */
-
     @Test
-    public void checkCreateAccount(){
+    public void checkSearchByUsername(){
+
         // Assertion for current activity being the main one
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
-        // Go to Create Account page
-        solo.clickOnView(solo.getView(R.id.create_account_button));
+        //Login to the testAccount: testusert41 if not login already
+        if(solo.searchText("Login")){
+            solo.clickOnView(solo.getView(R.id.login_button));
+            solo.enterText((EditText) solo.getView(R.id.username_field), "testusert41");
+            solo.clickOnView(solo.getView(R.id.login_button));
+        }
 
-        // Fill in account details
-        // Generate a random number to attach to account so it can be tested
-        // many times without wiping app data
-        final int randomLowerBound = 10000000;
-        final int randomUpperBound = 99999999;
-        Random random = new Random();
-        int randomUsernameID = random.nextInt(randomUpperBound - randomLowerBound) + randomLowerBound;
-
-        // Assemble some fake info to provide to account registration
-        String dummyUsername = "testuser" + Integer.toString(randomUsernameID);
-        String dummyEmail = dummyUsername + "@email.com";
-        String dummyPhone = "1234567890";
+        // Go to Search page from navbar
+        solo.clickOnView(solo.getView(R.id.search));
 
         // Enter in fake information for account registration
-        solo.enterText((EditText) solo.getView(R.id.username_field), dummyUsername);
-        solo.enterText((EditText) solo.getView(R.id.Email_field), dummyEmail);
-        solo.enterText((EditText) solo.getView(R.id.phone_number_field), dummyPhone);
+        solo.enterText((EditText) solo.getView(R.id.search_bar_input_text), "testuser");
 
-        // Proceed with account creation
-        solo.clickOnView(solo.getView(R.id.create_account_button));
+        // Proceed with Search button
+        solo.clickOnView(solo.getView(R.id.search_button));
 
         // Test to see if username is recognized
-        String welcomeMsg = dummyUsername;
-        assertTrue(solo.waitForText(welcomeMsg, 1, 3000));
+        String searchWelcomeMsg = "Name: " + "testuser";
+        assertTrue(solo.waitForText(searchWelcomeMsg, 1, 3000));
+
     }
+
+
 
     /**
      * Cleans up all intent testing objects after execution completes.

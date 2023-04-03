@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_color">
+
+
+
+    <ImageView
+        android:id="@+id/profile_image_circle"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/default_user_profphoto"
+        app:layout_constraintBottom_toBottomOf="@+id/user_info_section"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/user_info_section"
+        app:layout_constraintVertical_bias="0.32999998" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/user_info_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/profile_image_circle"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/username_textprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:text="@string/username_field_text"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/username_fieldprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="mahxr"
+            android:textColor="@color/bluefieldtext"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintStart_toStartOf="@+id/username_textprof"
+            app:layout_constraintTop_toBottomOf="@+id/username_textprof" />
+
+        <TextView
+            android:id="@+id/totalscore_textprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="12dp"
+            android:text="@string/totalscore_fieldtext"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintEnd_toEndOf="@+id/username_textprof"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/username_textprof"
+            app:layout_constraintTop_toBottomOf="@+id/username_fieldprof" />
+
+        <TextView
+            android:id="@+id/totalscore_fieldprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/totalscore_fieldprof"
+            android:textColor="@color/bluefieldtext"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintStart_toStartOf="@+id/totalscore_textprof"
+            app:layout_constraintTop_toBottomOf="@+id/totalscore_textprof" />
+
+
+        <TextView
+            android:id="@+id/codesscanned_textprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="12dp"
+            android:text="@string/codesscanned_fieldtext"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintEnd_toEndOf="@+id/totalscore_textprof"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/username_textprof"
+            app:layout_constraintTop_toBottomOf="@+id/totalscore_fieldprof" />
+
+        <TextView
+            android:id="@+id/codesscanned_fieldprof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/codesscanned_fieldprof"
+            android:textColor="@color/bluefieldtext"
+            android:textSize="26sp"
+            android:fontFamily="casual"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/codesscanned_textprof"
+            app:layout_constraintTop_toBottomOf="@+id/codesscanned_textprof"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/my_qr_codes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="bottom|center_horizontal"
+        android:text="My QR Codes"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:fontFamily="casual"
+        app:layout_constraintBottom_toTopOf="@+id/QRGalleryRecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/profile_image_circle"
+        app:layout_constraintStart_toStartOf="@+id/profile_image_circle"
+        app:layout_constraintTop_toBottomOf="@+id/profile_image_circle"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/QRGalleryRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_info_section"
+        app:layout_constraintVertical_bias="1.0"
+        tools:listitem="@layout/qrcode_gallery_card2" />
+
+    <ImageButton
+        android:id="@+id/backPage"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="59dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/baseline_arrow_back_ios_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

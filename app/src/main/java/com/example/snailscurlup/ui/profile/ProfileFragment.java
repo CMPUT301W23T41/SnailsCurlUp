@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,6 +70,7 @@ public class ProfileFragment extends Fragment   {
     private TextView userUsernameField, userTotalScoreField, userCodeScannedField;
 
     private  RecyclerView QRGallery;
+    private ConstraintLayout profileLayout;
 
 
 
@@ -111,6 +114,21 @@ public class ProfileFragment extends Fragment   {
          // Set up database
          // NOTE: This is separate from the "Database" class because async actions need to be done here.
 
+       allUsers = (AllUsers) getActivity().getApplicationContext();
+
+       // retrieve active user
+       if (allUsers.getActiveUser() != null) {
+           activeUser = allUsers.getActiveUser();
+       } else {
+           activeUser = new User();
+       }
+       Database db = Database.getInstance();
+       activeUser = allUsers.getActiveUser();
+       ArrayList<QRCodeInstanceNew> UserDbQRList= db.setActiveUserQRInstancesList(activeUser, getContext());
+       activeUser.resetscanedQRCodeInstance(UserDbQRList);
+       setAdapter(UserDbQRList,getParentFragmentManager());
+       Toast.makeText(getContext(), "on create view setadapter", Toast.LENGTH_SHORT);
+
 
 
 
@@ -123,10 +141,14 @@ public class ProfileFragment extends Fragment   {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
 
         QRGallery = view.findViewById(R.id.QRGalleryRecyclerView);
+        profileLayout= view.findViewById(R.id.profileconstraintlayout);
 
         allUsers = (AllUsers) getActivity().getApplicationContext();
 
@@ -137,19 +159,28 @@ public class ProfileFragment extends Fragment   {
             activeUser = new User();
         }
         Toast.makeText(getContext(), "on create view", Toast.LENGTH_SHORT);
-        // Update stuff from DB
-//        db = Database.getInstance();
-//        // activeUser.fetchQRInstancesFromDB();
-//        ArrayList<QRCodeInstanceNew> databaseCodes = db.getUserQRCodeInstances(activeUser, getContext());
-//        for (QRCodeInstanceNew code : databaseCodes) {
-//            activeUser.addScannedInstanceQrCodes(code);
-//        }
+
 
         /**** commented out try for new AbstractQr implementation
         QrGalleryAdapter qrGalleryAdapter = new QrGalleryAdapter(this.getContext(), activeUser.getScannedQrCodes());
         ******/
 
         /****** new AbstractQr implementation ****/
+
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                SortedUserQRInstances(4);
+            }
+
+
+
+
+            @Override
+            public void onViewDetachedFromWindow(@NonNull View v) {
+                // Code to execute when the view is detached from the window
+            }
+        });
 
 
 
@@ -229,6 +260,13 @@ public class ProfileFragment extends Fragment   {
 
         profileFloaMenuicon = view.findViewById(R.id.profile_floating_menuicon);
         qrGallerIcon = view.findViewById(R.id.sortby_qrgallery_button);
+
+
+        // Create a new OnGlobalLayoutListener to listen for layout changes
+
+
+// Add the layout listener to the view tree observer
+
 
 
 
@@ -450,6 +488,14 @@ public class ProfileFragment extends Fragment   {
                     return Integer.compare(QR2.getPointsInt(),QR1.getPointsInt());
                 }
             });
+
+        if(sortType==5){
+            Database db = Database.getInstance();
+            activeUser = allUsers.getActiveUser();
+            activeUser.resetscanedQRCodeInstance(sortedUserQRList);
+
+        }
+
 
         }
         /******* End of Reference *******/

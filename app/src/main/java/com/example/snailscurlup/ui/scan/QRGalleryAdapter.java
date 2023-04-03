@@ -80,9 +80,9 @@ public class QRGalleryAdapter extends RecyclerView.Adapter<QRGalleryAdapter.View
 
         // format timestamp with simple Date format and set it to the textview
         String pattern = " M/d/yy, h:mm a";
-      //  SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-       // String formattedTimestamp = simpleDateFormat.format(singleqrcode.getScanQRLogTimeStamp());
-        //holder.QRCodeTimeStamp.setText(formattedTimestamp);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String formattedTimestamp = simpleDateFormat.format(singleqrcode.getScanQRLogTimeStamp());
+        holder.QRCodeTimeStamp.setText(formattedTimestamp);
 
         // set the QR code image using Picasso
         Picasso.get().load(singleqrcode.getAbstractQR().getGenUrl()).into(holder.QrCodeVisual);
